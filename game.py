@@ -105,11 +105,14 @@ class Game:
 
     def __init__(self, num_players=1, player_speed=0.07, keyboard_input=False, render_messages=False, bagging=False,
                  headless=False, initial_state_filename=None, follow_player=-1, random_start=False,
-                 render_number=False, sprite_paths=None, record_path=None, stay_alive=False):
+                 render_number=False, sprite_paths=None, record_path=None, stay_alive=False, record_actions=False):
 
         self.screen = None
         self.clock = None
-
+        
+        self.record_actions = record_actions
+        self.action_history = []
+        
         if not headless:
             if follow_player == -1:
                 config.SCALE = 32
@@ -877,3 +880,10 @@ class Game:
                                     cart.width,
                                     cart.height):
                 register.carts_in_zone.remove(cart)
+    
+    def write_action_history(self, filename): 
+        with open(filename, "w") as f:
+            history = ""
+            for action in self.action_history: 
+                history += action + '\n'
+            f.write(history)

@@ -59,6 +59,14 @@ You can then run it (assuming the simulation is already running in another termi
 ```
 python socket_agent.py
 ```
+### Running the simulation with recorded action history
+
+Take a look at the "replay_agent_actions.py" file which has an example of how to send recorded commands from a file through a socket.
+
+```
+<python-command> replay_agent_actions.py [action_history_filename]
+```
+The action_history_file can be obtained by using the --record_actions in a regular game play to record the actions done in that game. The replay_agent_actions.py will replay the actions by sending the same commands to the socket environment. 
 
 ### Running the simulation with Java agents
 Put all of your agent code into a class called Agent.java (a template is in the repo) which has the following structure:
@@ -111,6 +119,7 @@ When running through the socket or from keyboard input, there are a number of co
 *  ``--bagging`` sets checkout option to use bagging
 *  ``--player_sprites=<filename>`` sets player sprites to specified sprites
 *  ``--record_path=<path>`` sets path for files when record action is used
+*  ``--record_actions`` records player actions and commands in the game and writes them to a file at the end of game play. The user will be prompted for a filename at the end of the game play to write to
 
 ## Norm Monitoring
 When run through keyboard input or through the socket, a norm monitor gym wrapper is automatically used and monitors all implemented norms. Currently we have 26 norm monitors implemented:

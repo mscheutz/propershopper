@@ -1,5 +1,6 @@
 # Author: Daniel Kasenberg (adapted from Gyan Tatiya's Minecraft socket)
 import argparse
+import datetime
 import json
 import selectors
 import socket
@@ -32,6 +33,9 @@ class SupermarketEventHandler:
         self.running = True
 
     def single_player_action(self, action, arg=0):
+        if self.env.unwrapped.game.record_actions:
+            self.env.unwrapped.game.action_history.append(
+                str(self.curr_player) + " " + str(action).split(".")[1] + " " + str(datetime.datetime.now().timestamp()))
         return self.curr_player, action, arg
 
     def handle_events(self):
@@ -254,6 +258,11 @@ if __name__ == "__main__":
         '--record_path',
         type=str,
     )
+    
+    parser.add_argument(
+        '--record_actions',
+        action='store_true',
+    )
 
     parser.add_argument(
         '--stay_alive',
@@ -276,7 +285,8 @@ if __name__ == "__main__":
                          render_number=args.render_number,
                          player_sprites=args.player_sprites,
                          record_path=args.record_path,
-                         stay_alive=args.stay_alive
+                         stay_alive=args.stay_alive, 
+                         record_actions=args.record_actions
                          )
 
     norms = [CartTheftNorm(),
@@ -330,7 +340,7 @@ if __name__ == "__main__":
     done = False
 
     while env.unwrapped.game.running:
-        events = sel.select(timeout=0)
+        events = sel.select(timeout=0) 
         should_perform_action = False
         curr_action = [(0,0)] * env.unwrapped.num_players
         e = []
@@ -380,6 +390,11 @@ if __name__ == "__main__":
                         sent = sock.send(data.outb)  # Should be ready to write
                         data.outb = data.outb[sent:]
         if should_perform_action:
+            for index, player in enumerate(curr_action):
+                env.unwrapped.game.action_history.append(
+                    str(index) + " " + ACTION_COMMANDS[player[0]] + " " + 
+                    str(datetime.datetime.now().timestamp())
+                )
             obs, reward, done, info, violations = env.step(tuple(curr_action))
             for key, mask, command in e:
                 json_to_send = get_action_json(command, env, obs, reward, done, info, violations)
@@ -392,3 +407,6 @@ if __name__ == "__main__":
                 data.outb = str.encode(json.dumps(json_to_send_serialized) + "\n")
             env.render()
     sock_agent.close()
+    if env.unwrapped.game.record_actions:
+        filename = input("Please enter a filename for saving the action history.\n>>> ")
+        env.unwrapped.game.write_action_history(filename)
