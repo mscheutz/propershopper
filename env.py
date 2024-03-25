@@ -78,7 +78,8 @@ class SupermarketEnv(gym.Env):
                          sprite_paths=self.player_sprites,
                          record_path=self.record_path,
                          stay_alive=self.stay_alive, 
-                         record_actions=self.record_actions)
+                         record_actions=self.record_actions
+                         )
         self.unwrapped.game.set_up()
         if obs is not None:
             self.unwrapped.game.set_observation(obs)

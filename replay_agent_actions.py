@@ -28,6 +28,14 @@ if __name__ == "__main__":
     sock_game = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_game.connect((HOST, PORT))
 
+    print("Sending playback signal")
+    sock_game.send(str.encode("Playback"))  # send action to env
+    
+    output = recv_socket_data(sock_game)  # get observation from env
+    output = json.loads(output)
+
+    
+    
     actions = []
     with open(args.filename, "r") as file:
         for line in file:
@@ -38,7 +46,8 @@ if __name__ == "__main__":
         print("Sending action: ", action)
         sock_game.send(str.encode(action))  # send action to env
 
-        output = recv_socket_data(sock_game)  # get observation from env
-        output = json.loads(output)
+        output = recv_socket_data(sock_game)  # get observation from env (wait for response before sending next command)
+        # output = json.loads(output) # Put back if you want to inspect received message
 
-        print("JSON: ", output)
+        # print("JSON: ", output)
+    exit()

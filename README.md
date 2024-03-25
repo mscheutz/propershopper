@@ -169,6 +169,8 @@ Below is a table of the gym ids of the actions available in this environment (le
 | 8      | Pick Up            | N/A          |
 | N/A    | View inventory     | 'i'          |
 | N/A    | View shopping list | 'l'          |
+| N/A    | Pause              | 'p'          |
+| N/A    | Reverse/Revert     | 'z'          |
 
 Actions are formatted as tuples. In the pick-up action an agent can specify an index that corresponds with a food item.
 
@@ -204,6 +206,8 @@ While the best way to get a sense for how the game works is to try running it in
 * Toggle shopping cart: if the user is currently holding a shopping cart, this lets go of the cart. Otherwise, picks up the cart. Note that to pick up a cart, the user must be behind the shopping cart (adjacent to the handle).
 * Display inventory:  displays a list of the food (a) that the player is holding, or (b) that is in the player’s cart, and the quantities of each food. Only available in keyboard mode; not necessary in gym/socket mode (since this information is already available in the observation).
 * Display shopping list:  displays a list of the food on the player’s shopping list, and the quantities of each food. Only available in keyboard mode; not necessary in gym/socket mode (since this information is already available in the observation).
+* Pause: Pauses the game play. Generally only useful in history playback
+* Reverse/revert: Actions are reversed to be played back again if the game play is playing back history sent from replay_agent_actions.py. The same commands will be played back again after the reverse. Otherwise, this reverts the player actions and allows different commands to be sent. If the revert command is called when the user is in an action recording game state, the action history will also be altered so that the reverted actions do not show up in history. 
 
 ### General facts
 
