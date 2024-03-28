@@ -2,7 +2,6 @@
 import argparse
 import datetime
 import json
-from pprint import pprint
 import selectors
 import socket
 import types
@@ -14,6 +13,8 @@ from norms.norms import *
 import pygame
 
 ACTION_COMMANDS = ['NOP', 'NORTH', 'SOUTH', 'EAST', 'WEST', 'INTERACT', 'TOGGLE_CART', 'CANCEL', 'SELECT','RESET']
+
+GAME_COMMANDS = ['ESCAPE', 'SAVE', 'TOGGLE_RECORD', 'PAUSE', 'REVERT']
 
 def serialize_data(data):
     if isinstance(data, set):
@@ -261,6 +262,20 @@ def get_action_json(action, env_, obs, reward, done, info_=None, violations=''):
     # action_json = {"hello": "world"}
     return action_json
 
+def is_game_command(command_):
+    return command_ in GAME_COMMANDS
+
+def get_event(command_): 
+    if command_ == 'ESCAPE':
+        return pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)
+    elif command_ == 'SAVE':
+        return pygame.event.Event(pygame.KEYDOWN, key=pygame.K_s)
+    elif command_ == 'TOGGLE_RECORD':
+        return pygame.event.Event(pygame.KEYDOWN, key=pygame.K_r)
+    elif command_ == 'PAUSE':
+        return pygame.event.Event(pygame.KEYDOWN, key=pygame.K_p)
+    elif command_ == 'REVERT':
+        return pygame.event.Event(pygame.KEYDOWN, key=pygame.K_z)
 
 def is_single_player(command_):
     return ',' not in command_
@@ -449,7 +464,7 @@ if __name__ == "__main__":
         curr_action = [(0,0)] * env.unwrapped.num_players
         e = []
         if not args.headless:
-            handler.handle_events() # TIA TODO: INJECTION OF KEYBOARD COMMANDS
+            handler.handle_events()
             env.render()
         for key, mask in events:
             if key.data is None:
@@ -474,6 +489,9 @@ if __name__ == "__main__":
                                 data.outb = str.encode(json.dumps(json_to_send,default=lambda o: o.__dict__) + "\n")
                             if is_playback_mode(command): 
                                 env.unwrapped.game.is_playback = True
+                            if is_game_command(command):
+                                keydown_event = get_event(command)
+                                pygame.event.post(keydown_event)
                             if is_single_player(command):
                                 player, command, arg = get_player_and_command(command)
                                 e.append((key, mask, command))

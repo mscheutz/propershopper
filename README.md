@@ -59,6 +59,16 @@ You can then run it (assuming the simulation is already running in another termi
 ```
 python socket_agent.py
 ```
+
+### Running the simulation with Python agents that takes keyboard inputs
+
+Take a look at the "keyboard_agent.py" file which has an example of how to send keyboard input commands through a socket.
+
+```
+<python-command> keyboard_agent.py
+```
+A control display will pop up. Click on the display to focus on it and send keyboard commands. The program will convert the commands and send the action commands to the socket environment to carry out the game play.
+
 ### Running the simulation with recorded action history
 
 Take a look at the "replay_agent_actions.py" file which has an example of how to send recorded commands from a file through a socket.
