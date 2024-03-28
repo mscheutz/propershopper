@@ -1,3 +1,4 @@
+import copy
 from random import uniform, choice
 
 import pygame
@@ -112,6 +113,9 @@ class Game:
         
         self.record_actions = record_actions
         self.action_history = []
+        
+        self.is_playback = False
+        self.game_state_observations = dict() # Used to reverse back to a certain state in the game
         
         if not headless:
             if follow_player == -1:
@@ -331,10 +335,14 @@ class Game:
             y = uniform(0, 25)
         player.position = [x, y]
 
-    def save_state(self, filename):
-        with open(filename, "w") as f:
-            f.write(str(self.observation(True)))
-            # f.write(str(self.observation(False)))
+    def save_state(self, filename=None, obs=None):
+        if obs: 
+            self.game_state_observations[obs[0]] = copy.deepcopy(obs[1])
+        
+        elif filename:
+            with open(filename, "w") as f:
+                f.write(str(self.observation(True)))
+                # f.write(str(self.observation(False)))
 
     def current_player(self):
         if self.curr_player == -1:
@@ -884,6 +892,6 @@ class Game:
     def write_action_history(self, filename): 
         with open(filename, "w") as f:
             history = ""
-            for action in self.action_history: 
-                history += action + '\n'
+            for row in self.action_history: 
+                history += row[0] + " " + row[1] + " " + row[3] + "\n"
             f.write(history)
