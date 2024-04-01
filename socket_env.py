@@ -259,6 +259,13 @@ if __name__ == "__main__":
         '--stay_alive',
         action='store_true',
     )
+    
+    parser.add_argument(
+        '--stochastic',
+        help="file to read stochastic success probabilities of actions",
+        action='store_true',
+    )
+    
 
     args = parser.parse_args()
 
@@ -276,7 +283,8 @@ if __name__ == "__main__":
                          render_number=args.render_number,
                          player_sprites=args.player_sprites,
                          record_path=args.record_path,
-                         stay_alive=args.stay_alive
+                         stay_alive=args.stay_alive, 
+                         stochastic = args.stochastic
                          )
 
     norms = [CartTheftNorm(),

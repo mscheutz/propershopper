@@ -1,7 +1,9 @@
+import random
 import time
 
+from enums.action_probabilities import Action_Probabilities
 import gymnasium as gym
-from enums.player_action import PlayerAction
+from enums.player_action import PlayerAction, PlayerActionTable
 from game import Game
 
 MOVEMENT_ACTIONS = [PlayerAction.NORTH, PlayerAction.SOUTH, PlayerAction.EAST, PlayerAction.WEST]
@@ -11,7 +13,7 @@ class SupermarketEnv(gym.Env):
 
     def __init__(self, num_players=1, player_speed=0.15, keyboard_input=False, render_messages=True, bagging=False,
                  headless=False, initial_state_filename=None, follow_player=-1, random_start=False,
-                 render_number=False, max_num_items=33, player_sprites=None, record_path=None, stay_alive=False):
+                 render_number=False, max_num_items=33, player_sprites=None, record_path=None, stay_alive=False, stochastic=False):
 
         super(SupermarketEnv, self).__init__()
 
@@ -40,11 +42,27 @@ class SupermarketEnv(gym.Env):
         self.observation_space = gym.spaces.Dict()
         self.headless = headless
         self.random_start = random_start
+        self.action_probability = {}
+        
+        if (stochastic): # storing probability of action success rate
+            filename = input("Input stochastic probability file name: ")
+            with open(filename, "r") as file: 
+                content = file.read()
+                for row in content.split("\n"):
+                    action_row = list(map(lambda column: column.strip(": "), row.split("\t")))
+                    probability_pairs = map(lambda result: tuple(result.split(" ")), action_row[1:])
+                    self.action_probability[PlayerActionTable[action_row[0]]] = dict(map(lambda pair: (PlayerActionTable[pair[0]], int(pair[1])), probability_pairs))
+        else: 
+            self.action_probability = Action_Probabilities
+
+    def get_stochastic_action(self, action):
+        return random.choices(list(self.action_probability[action].keys()), weights=list(self.action_probability[action].values()), k=1)[0]
 
     def step(self, action):
         done = False
         for i, player_action in enumerate(action):
             player_action, arg = player_action
+            player_action = self.get_stochastic_action(player_action)
             if player_action in MOVEMENT_ACTIONS:
                 self.unwrapped.game.player_move(i, player_action)
             elif player_action == PlayerAction.NOP:
@@ -114,6 +132,7 @@ class SinglePlayerSupermarketEnv(gym.Wrapper):
     def step(self, player_action):
         done = False
         i, player_action, arg = player_action
+        player_action = self.get_stochastic_action(player_action)
         if player_action in MOVEMENT_ACTIONS:
             self.unwrapped.game.player_move(i, player_action)
         elif player_action == PlayerAction.NOP:
