@@ -3,9 +3,12 @@
 
 import json
 import socket
+from copy import deepcopy
 
 import pandas as pd
 
+from enums.direction import Direction
+from final_proj.astar_static import astar, init_map, convert_to_astar
 from final_proj.util import get_geometry
 from utils import recv_socket_data
 
@@ -15,19 +18,29 @@ def populate_locs(observation):
     locs: dict = {}
 
     for idx, obj in enumerate(observation['registers']):
-        locs[f'register {idx}'] = get_geometry(obj)
+        geometry = get_geometry(obj)
+        geometry['position'][0] += geometry['width'] + 1
+        locs[f'register {idx}'] = geometry
 
     for idx, obj in enumerate(observation['cartReturns']):
-        locs[f'cartReturn {idx}'] = get_geometry(obj)
+        geometry = get_geometry(obj)
+        geometry['position'][1] -= 1
+        locs[f'cartReturn {idx}'] = geometry
 
     for idx, obj in enumerate(observation['basketReturns']):
-        locs[f'basketReturn {idx}'] = get_geometry(obj)
+        geometry = get_geometry(obj)
+        geometry['position'][1] -= 1
+        locs[f'basketReturn {idx}'] = geometry
 
     for obj in observation['counters']:
-        locs[obj['food']] = get_geometry(obj)
+        geometry = get_geometry(obj)
+        geometry['position'][0] -= 1
+        locs[obj['food']] = geometry
 
     for obj in observation['shelves']:
-        locs[obj['food']] = get_geometry(obj)
+        geometry = get_geometry(obj)
+        geometry['position'][1] += geometry['height'] + 1
+        locs[obj['food']] = geometry
 
     return locs
 
@@ -75,15 +88,36 @@ class Agent:
 
         # todo: check if we're holding a cart
         holding_cart = False
-
         if holding_cart:
             print(f"Agent {self.agent_id} going to location {goal} with cart")
 
             pass  # todo
         else:
             print(f"Agent {self.agent_id} going to location {goal} without cart")
+            player = self.obs['observation']['players'][self.agent_id]
+            path = astar(goal, player, init_map(self.obs))
+            for node in path:
+                player = self.obs['observation']['players'][self.agent_id]
+                player_x = convert_to_astar(player['position'][0])
+                player_y = convert_to_astar(player['position'][1])
+                if player_x < node[1]:
+                    command = Direction.EAST
+                elif player_x > node[1]:
+                    command = Direction.WEST
+                elif player_y < node[0]:
+                    command = Direction.SOUTH
+                elif player_y > node[0]:
+                    command = Direction.NORTH
+                else:
+                    continue
 
-            pass  # todo
+                self.step(command, player['direction'])
+
+    def step(self, command: Direction, direction: Direction):
+        if not command == direction:
+            self.execute(command.name)
+        self.execute(command.name)
+        self.execute(command.name)
 
     # Agent picks up an item and adds it to the cart
     def add_to_cart(self):
@@ -133,9 +167,8 @@ if __name__ == "__main__":
     output = recv_socket_data(sock_game)  # get observation from env
     output = json.loads(output)
     locs = populate_locs(output['observation'])
-
-    # agents = [Agent(sock_game, 0)]
-    agents = [Agent(sock_game, 0), Agent(sock_game, 1), Agent(sock_game, 2)]
+    agents = [Agent(sock_game, 0)]
+    # agents = [Agent(sock_game, 0), Agent(sock_game, 1), Agent(sock_game, 2)]
     while True:
         for agent in agents:
             agent.transition()

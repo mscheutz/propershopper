@@ -1,3 +1,5 @@
+import decimal
+import math
 from copy import deepcopy
 
 from enums.direction import Direction
@@ -63,8 +65,43 @@ def project_collision(obj, state, direction: Direction, dist=0.4):
     return False
 
 
+def project_collision_dyn(obj, state, direction: Direction, dist=0.4):
+    obj_copy = deepcopy(obj)
+
+    if direction == Direction.NORTH:
+        obj_copy['position'][1] -= dist
+        if obj_copy['position'][1] < 2:
+            return 1
+    elif direction == Direction.EAST:
+        obj_copy['position'][0] += dist
+        if obj_copy['position'][0] > 18.5:
+            return 1
+    elif direction == Direction.SOUTH:
+        obj_copy['position'][1] += dist
+        if obj_copy['position'][1] > 24:
+            return 1
+    elif direction == Direction.WEST:
+        obj_copy['position'][0] -= dist
+        if obj_copy['position'][0] < 2:
+            return 1
+
+    for key, value in state['observation'].items():
+        for item in value:
+            if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
+                        item['position'][0], item['position'][1], item['width'], item['height'])):
+                if not (obj_copy == item or (
+                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
+                    if key == "players":
+                        return 0
+                    else:
+                        return 1
+    return 0
+
+
 def round_float(n, granularity):
-    return round(round(n / granularity) * granularity, 1)
+    d = decimal.Decimal(str(granularity))
+    precision = -1*d.as_tuple().exponent
+    return round(round(n / granularity) * granularity, precision)
 
 
 def euclidean_distance(pos1, pos2):

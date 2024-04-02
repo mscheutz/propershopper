@@ -47,7 +47,6 @@ class SupermarketEnv(gym.Env):
             player_action, arg = player_action
             if player_action in MOVEMENT_ACTIONS:
                 self.unwrapped.game.player_move(i, player_action)
-                self.unwrapped.game.player_move(i, player_action)
             elif player_action == PlayerAction.NOP:
                 self.unwrapped.game.nop(i)
             elif player_action == PlayerAction.INTERACT:
@@ -116,7 +115,6 @@ class SinglePlayerSupermarketEnv(gym.Wrapper):
         done = False
         i, player_action, arg = player_action
         if player_action in MOVEMENT_ACTIONS:
-            self.unwrapped.game.player_move(i, player_action)
             self.unwrapped.game.player_move(i, player_action)
         elif player_action == PlayerAction.NOP:
             self.unwrapped.game.nop(i)
