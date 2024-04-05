@@ -13,19 +13,21 @@ import heapq
 STEP = 0.3
 BUFFER = 0.3
 
+
 def init_map(obs):
     map_ = []
     tile = {
         "position": [0, 0],
-        "width": 0.6 + BUFFER,
-        "height": 0.4 + BUFFER
+        "width": 0.6,
+        "height": 0.4,
+        "index": 0
     }
     max_width = 25
     max_height = 25
     while tile["position"][1] < max_height:
         map_.append([])
         while tile["position"][0] < max_width:
-            map_[len(map_) - 1].append(project_collision_dyn(tile, obs, Direction.NONE))
+            map_[len(map_) - 1].append(project_collision_dyn(tile, obs, Direction.NONE, buffer=BUFFER))
             tile["position"][0] += STEP
 
         tile["position"][0] = 0
@@ -33,16 +35,26 @@ def init_map(obs):
 
     # map_ = update_dyn(map_, obs)
 
+    x = np.asarray(map_, np.uint8)
+    im = Image.fromarray(x, 'P')
+    im.putpalette([0, 0, 0,  # Black
+                   255, 0, 0,  # Red
+                   0, 255, 0,  # g
+                   0, 255, 255])  # b
+    im.show()
+
     return map_
 
 
-def update_dyn(map_: [[]], state):
+def update_dyn(map_: [[]], state, index=0):
     for player in state['observation']['players']:
-        x = round(player['position'][0] / 0.15)
-        y = round(player['position'][1] / 0.15)
-        for i in range(math.ceil(player['width'] / 0.15)):
-            for j in range(math.ceil(player['height'] / 0.15)):
-                map_[y + j][x + i] = 2
+        if player['index'] == index:
+            continue
+        x = round((player['position'][0] - BUFFER) / STEP)
+        y = round((player['position'][1] - BUFFER) / STEP)
+        for i in range(math.ceil((player['width'] + BUFFER) / STEP)):
+            for j in range(math.ceil((player['height'] + BUFFER) / STEP)):
+                map_[y + j][x + i] = -1
     return map_
 
 
@@ -84,21 +96,8 @@ def return_path(current_node):
 
 
 def astar(goal, player, maze):
-    player_copy = deepcopy(player)
-    goal_copy = deepcopy(goal)
-
-    start = (round(player_copy['position'][1] / STEP), round(player_copy['position'][0] / STEP))
-    end = (round(goal_copy['position'][1] / STEP), round(goal_copy['position'][0] / STEP))
-
-    # maze[start[1]][start[0]] = 2
-    # maze[end[1]][end[0]] = 3
-    # x = np.asarray(maze, np.uint8)
-    # im = Image.fromarray(x, 'P')
-    # im.putpalette([0, 0, 0,  # Black
-    #                255, 0, 0,  # Red
-    #                0, 255, 0, #g
-    #                0, 255, 255])  # b
-    # im.show()
+    start = (round(player['position'][1] / STEP), round(player['position'][0] / STEP))
+    end = (round(goal['position'][1] / STEP), round(goal['position'][0] / STEP))
 
     # Create start and end node
     start_node = Node(None, start)
@@ -147,11 +146,6 @@ def astar(goal, player, maze):
             # Get node position
             node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
-            # Make sure within range
-            if node_position[0] > (len(maze) - 1) or node_position[0] < 0 or node_position[1] > (
-                    len(maze[len(maze) - 1]) - 1) or node_position[1] < 0:
-                continue
-
             # Make sure walkable terrain
             if maze[node_position[0]][node_position[1]] != 0:
                 continue
@@ -185,9 +179,14 @@ def astar(goal, player, maze):
     warn("Couldn't get a path to destination")
     return None
 
+
 def convert_to_real(loc):
     return loc * STEP
 
 
-def convert_to_astar(loc):
+def convert_to_index(loc):
     return round(loc / STEP)
+
+
+def get_pathfind_index(obj):
+    return f"{convert_to_index(obj['position'][1])},{convert_to_index(obj['position'][0])}"

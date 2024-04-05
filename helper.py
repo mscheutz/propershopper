@@ -65,7 +65,7 @@ def project_collision(obj, state, direction: Direction, dist=0.4):
     return False
 
 
-def project_collision_dyn(obj, state, direction: Direction, dist=0.4):
+def project_collision_dyn(obj, state, direction: Direction, dist=0.4, buffer=0):
     obj_copy = deepcopy(obj)
 
     if direction == Direction.NORTH:
@@ -88,19 +88,20 @@ def project_collision_dyn(obj, state, direction: Direction, dist=0.4):
     for key, value in state['observation'].items():
         for item in value:
             if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
-                        item['position'][0], item['position'][1], item['width'], item['height'])):
+                        item['position'][0] - buffer, item['position'][1] - buffer, item['width'] + buffer,
+                        item['height'] + buffer)):
                 if not (obj_copy == item or (
                         'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
                     if key == "players":
-                        return 0
+                        return -1
                     else:
-                        return 1
+                        return -1
     return 0
 
 
 def round_float(n, granularity):
     d = decimal.Decimal(str(granularity))
-    precision = -1*d.as_tuple().exponent
+    precision = -1 * d.as_tuple().exponent
     return round(round(n / granularity) * granularity, precision)
 
 

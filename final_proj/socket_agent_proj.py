@@ -6,10 +6,11 @@ import socket
 from copy import deepcopy
 
 import pandas as pd
+import pathfind.graph.transform
 
 from enums.direction import Direction
-from final_proj.astar_static import astar, init_map, convert_to_astar
 from final_proj.util import get_geometry
+from helper import project_collision
 from utils import recv_socket_data
 
 
@@ -94,29 +95,55 @@ class Agent:
             pass  # todo
         else:
             print(f"Agent {self.agent_id} going to location {goal} without cart")
+            self.nav(goal)
+
+    def nav(self, goal):
+        target = "x"
+        reached_x = False
+        reached_y = False
+        while True:
             player = self.obs['observation']['players'][self.agent_id]
-            path = astar(goal, player, init_map(self.obs))
-            for node in path:
-                player = self.obs['observation']['players'][self.agent_id]
-                player_x = convert_to_astar(player['position'][0])
-                player_y = convert_to_astar(player['position'][1])
-                if player_x < node[1]:
+            player_x = player['position'][0]
+            player_y = player['position'][1]
+            goal_x = goal['position'][0]
+            goal_y = goal['position'][1]
+
+            x_dist = abs(player_x - goal_x)
+            y_dist = abs(player_y - goal_y)
+
+            if target == "x":
+                if (player_x - goal_x) < -0.15:
                     command = Direction.EAST
-                elif player_x > node[1]:
+                elif (player_x - goal_x) > 0.15:
                     command = Direction.WEST
-                elif player_y < node[0]:
+                else:
+                    reached_x = True
+                    if y_dist > 0.15:
+                        reached_y = False
+                        target = "y"
+                        continue
+            else:
+                if (player_y - goal_y) < -0.15:
                     command = Direction.SOUTH
-                elif player_y > node[0]:
+                elif (player_y - goal_y) > 0.15:
                     command = Direction.NORTH
                 else:
-                    continue
+                    reached_y = True
+                    if x_dist > 0.15:
+                        reached_x = False
+                        target = "x"
+                        continue
 
+            if reached_x and reached_y:
+                break
+            else:
+                while project_collision(player, self.obs, command, 0.4):
+                    command = Direction((command.value + 1) % 4)
                 self.step(command, player['direction'])
 
     def step(self, command: Direction, direction: Direction):
         if not command == direction:
             self.execute(command.name)
-        self.execute(command.name)
         self.execute(command.name)
 
     # Agent picks up an item and adds it to the cart
