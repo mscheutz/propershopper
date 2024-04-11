@@ -14,6 +14,8 @@ from helper import project_collision
 from utils import recv_socket_data
 
 
+STEP = 0.15
+
 # todo: update with Helen's method for making interaction areas?
 def populate_locs(observation):
     locs: dict = {}
@@ -103,46 +105,42 @@ class Agent:
         reached_y = False
         while True:
             player = self.obs['observation']['players'][self.agent_id]
-            player_x = player['position'][0]
-            player_y = player['position'][1]
-            goal_x = goal['position'][0]
-            goal_y = goal['position'][1]
 
-            x_dist = abs(player_x - goal_x)
-            y_dist = abs(player_y - goal_y)
+            x_dist = player['position'][0] - goal['position'][0]
+            y_dist = player['position'][1] - goal['position'][1]
 
-            if target == "x":
-                if (player_x - goal_x) < -0.15:
-                    command = Direction.EAST
-                elif (player_x - goal_x) > 0.15:
-                    command = Direction.WEST
-                else:
-                    reached_x = True
-                    if y_dist > 0.15:
-                        reached_y = False
-                        target = "y"
-                        continue
-            else:
-                if (player_y - goal_y) < -0.15:
-                    command = Direction.SOUTH
-                elif (player_y - goal_y) > 0.15:
-                    command = Direction.NORTH
-                else:
-                    reached_y = True
-                    if x_dist > 0.15:
-                        reached_x = False
-                        target = "x"
-                        continue
-
+            if abs(x_dist) < STEP:
+                reached_x = True
+            if abs(y_dist) < STEP:
+                reached_y = True
             if reached_x and reached_y:
                 break
-            else:
-                while project_collision(player, self.obs, command, 0.4):
-                    command = Direction((command.value + 1) % 4)
-                self.step(command, player['direction'])
 
-    def step(self, command: Direction, direction: Direction):
-        if not command == direction:
+            if target == "x":
+                if x_dist < -STEP:
+                    command = Direction.EAST
+                elif x_dist > STEP:
+                    command = Direction.WEST
+                else:
+                    reached_y = False
+                    target = "y"
+                    continue
+            else:
+                if y_dist < -STEP:
+                    command = Direction.SOUTH
+                elif y_dist > STEP:
+                    command = Direction.NORTH
+                else:
+                    reached_x = False
+                    target = "x"
+                    continue
+
+            while project_collision(player, self.obs, command, 0.8):
+                command = Direction((command.value + 1) % 4)
+            self.step(command, player)
+
+    def step(self, command: Direction, player):
+        if not command == player['direction']:
             self.execute(command.name)
         self.execute(command.name)
 
