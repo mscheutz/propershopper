@@ -11,38 +11,45 @@ import pathfind.graph.transform
 from enums.direction import Direction
 from final_proj.util import get_geometry
 from helper import project_collision
-from utils import recv_socket_data
+from util import *
 
 
 STEP = 0.15
 
 # todo: update with Helen's method for making interaction areas?
 def populate_locs(observation):
+    # add interaction areas to objects in the observation
+    obs_with_boxes = add_interact_boxes_to_obs(obs=observation)
     locs: dict = {}
 
-    for idx, obj in enumerate(observation['registers']):
+    for idx, obj in enumerate(obs_with_boxes['registers']):
         geometry = get_geometry(obj)
         geometry['position'][0] += geometry['width'] + 1
+        geometry['interact_boxes'] = obj['interact_boxes']
         locs[f'register {idx}'] = geometry
 
-    for idx, obj in enumerate(observation['cartReturns']):
+    for idx, obj in enumerate(obs_with_boxes['cartReturns']):
         geometry = get_geometry(obj)
         geometry['position'][1] -= 1
+        geometry['interact_boxes'] = obj['interact_boxes']
         locs[f'cartReturn {idx}'] = geometry
 
-    for idx, obj in enumerate(observation['basketReturns']):
+    for idx, obj in enumerate(obs_with_boxes['basketReturns']):
         geometry = get_geometry(obj)
         geometry['position'][1] -= 1
+        geometry['interact_boxes'] = obj['interact_boxes']
         locs[f'basketReturn {idx}'] = geometry
 
-    for obj in observation['counters']:
+    for obj in obs_with_boxes['counters']:
         geometry = get_geometry(obj)
         geometry['position'][0] -= 1
+        geometry['interact_boxes'] = obj['interact_boxes']
         locs[obj['food']] = geometry
 
-    for obj in observation['shelves']:
+    for obj in obs_with_boxes['shelves']:
         geometry = get_geometry(obj)
         geometry['position'][1] += geometry['height'] + 1
+        geometry['interact_boxes'] = obj['interact_boxes']
         locs[obj['food']] = geometry
 
     return locs
