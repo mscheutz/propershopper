@@ -3,6 +3,7 @@ import json
 import copy
 from constants import *
 from copy import deepcopy
+from constants import *
 
 
 def get_geometry(obj):
@@ -26,6 +27,10 @@ def recv_socket_data(sock):
             break
 
     return data
+
+def manhattan_distance(pos1, pos2):
+    # Calculate the Manhattan distance from pos1 to pos2
+    return abs(pos2[0] - pos1[1]) + abs(pos2[1] - pos2[0])
 
 def euclidean_distance(pos1, pos2):
     # Calculate Euclidean distance between two points
