@@ -10,7 +10,6 @@ default_start_pos = [1.5, 15.6]
 interact_distance = 0.25
 cart_pos_left = [1, 18.5] # The position of the cart in the environment from [1, 2] in x, and y = 18.5
 cart_pos_right = [2, 18.5]
-basketReturn = []
 counter = []
 loc = [1, 17.5]
 register_region_x = 1 + 2.25

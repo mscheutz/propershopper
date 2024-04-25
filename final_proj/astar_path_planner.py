@@ -8,6 +8,7 @@ import json
 import socket
 
 from utils import recv_socket_data
+from util import *
 
 cartReturns = [2, 18.5]
 basketReturns = [3.5, 18.5]
@@ -112,10 +113,11 @@ class Astar_agent:
 
 
     def overlap(self, x1, y1, width_1, height_1, x2, y2, width_2, height_2):
-        return  (x1 > x2 + width_2 or x2 > x1 + width_1 or y1 > y2 + height_2 or y2 > y1 + height_1)
+        return not (x1 > x2 + width_2 or x2 > x1 + width_1 or y1 > y2 + height_2 or y2 > y1 + height_1)
 
     def objects_overlap(self, x1, y1, width_1, height_1, x2, y2, width_2, height_2):
         return self.overlap(x1, y1, width_1, height_1, x2, y2, width_2, height_2)
+    
     def collision(self, x, y, width, height, obj):
         """
         Check if a rectangle defined by (x, y, width, height) does NOT intersect with an object
@@ -175,7 +177,7 @@ class Astar_agent:
 
     def hits_wall(self, x, y):
         wall_width = 0.4
-        return not (y <= 2 or y + self.size[1] >= self.map_height - wall_width or \
+        return (y <= 2 or y + self.size[1] >= self.map_height - wall_width or \
                 x + self.size[0] >= self.map_width - wall_width) 
 
     def neighbors(self, point, map_width, map_height, objs):
@@ -187,13 +189,13 @@ class Astar_agent:
         results = []
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
-            if 0 <= nx < map_width and 0 <= ny < map_height and all(self.objects_overlap(nx, ny, self.size[0], self.size[1], obj['position'][0],
-                                                                                           obj['position'][1], obj['width'], obj['height']) for obj in objs) and  self.hits_wall( nx, ny):
+            collision = any(self.objects_overlap(nx, ny, self.size[0], self.size[1], obj['position'][0], obj['position'][1], obj['width'], obj['height']) for obj in objs)
+            if 0 <= nx < map_width and 0 <= ny < map_height and not collision and not self.hits_wall(nx, ny):
                 results.append((nx, ny))
         return results
-    def is_close_enough(self, current, goal, tolerance=0.15, is_item = True):
+    def is_close_enough(self, current, goal:tuple|dict, tolerance=0.15, is_item = True):
         """Check if the current position is within tolerance of the goal position."""
-        if is_item is not None:
+        if is_item:
             tolerance = 0.6
             return (abs(current[0] - goal[0]) < tolerance - 0.15  and abs(current[1] - goal[1]) < tolerance +0.05 )
 
@@ -235,7 +237,7 @@ class Astar_agent:
             path.reverse()
             return path
 
-        return None  # No path found
+        return []  # No path found
     # PlayerAction.NORTH: (Direction.NORTH, (0, -1), 0),
     # PlayerAction.SOUTH: (Direction.SOUTH, (0, 1), 1),
     # PlayerAction.EAST: (Direction.EAST, (1, 0), 2),

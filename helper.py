@@ -39,19 +39,23 @@ def project_collision(obj, state, direction: Direction, dist=0.4):
     obj_copy = deepcopy(obj)
 
     if direction == Direction.NORTH:
-        obj_copy['position'][1] -= dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][1] -= dist
         if obj_copy['position'][1] < 2:
             return True
     elif direction == Direction.EAST:
-        obj_copy['position'][0] += dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][0] += dist
         if obj_copy['position'][0] > 18.5:
             return True
     elif direction == Direction.SOUTH:
-        obj_copy['position'][1] += dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][1] += dist
         if obj_copy['position'][1] > 24:
             return True
     elif direction == Direction.WEST:
-        obj_copy['position'][0] -= dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][0] -= dist
         if obj_copy['position'][0] < 2:
             return True
 
@@ -69,21 +73,25 @@ def project_collision_dyn(obj, state, direction: Direction, dist=0.4, buffer=0):
     obj_copy = deepcopy(obj)
 
     if direction == Direction.NORTH:
-        obj_copy['position'][1] -= dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][1] -= dist
         if obj_copy['position'][1] < 2:
-            return 1
+            return True
     elif direction == Direction.EAST:
-        obj_copy['position'][0] += dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][0] += dist
         if obj_copy['position'][0] > 18.5:
-            return 1
+            return True
     elif direction == Direction.SOUTH:
-        obj_copy['position'][1] += dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][1] += dist
         if obj_copy['position'][1] > 24:
-            return 1
+            return True
     elif direction == Direction.WEST:
-        obj_copy['position'][0] -= dist
+        if obj_copy['direction'] == direction:#object moves
+            obj_copy['position'][0] -= dist
         if obj_copy['position'][0] < 2:
-            return 1
+            return True
 
     for key, value in state['observation'].items():
         for item in value:

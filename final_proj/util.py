@@ -1,9 +1,12 @@
 import time
 import json
 import copy
+from pathlib import Path
 from constants import *
 from copy import deepcopy
 from constants import *
+from enums.direction import Direction
+from helper import *
 
 
 def get_geometry(obj):
@@ -30,7 +33,7 @@ def recv_socket_data(sock):
 
 def manhattan_distance(pos1, pos2):
     # Calculate the Manhattan distance from pos1 to pos2
-    return abs(pos2[0] - pos1[1]) + abs(pos2[1] - pos2[0])
+    return abs(pos2[0] - pos1[0]) + abs(pos2[1] - pos2[1])
 
 def euclidean_distance(pos1, pos2):
     # Calculate Euclidean distance between two points
@@ -50,6 +53,33 @@ def bounding_box(place:dict) -> dict:
     width = place['width']
     return {"northmost":upper_left[1], "westmost":upper_left[0], "southmost":upper_left[1]+height, "eastmost":upper_left[0]+width}
 
+def find_midpoint(interact_box:dict) -> tuple[float, float]:
+    """find the midpoint along an edge of an interact box. Which edge it is depends on the direction the player needs to face in the box
+
+    Args:
+        interact_box (dict): an interact box for an object
+
+    Returns:
+        tuple[float, float]: (x, y)
+    """
+    player_needs_to_face = interact_box['player_needs_to_face']
+    if player_needs_to_face == Direction.NORTH.name:#this box is to the SOUTH of the interaction object
+        edge_y = interact_box['southmost']
+        edge_x = (interact_box['eastmost'] - interact_box['westmost']) / 2.0 + interact_box['westmost']
+        return (edge_x, edge_y)
+    elif player_needs_to_face == Direction.SOUTH.name:#this box is to the NORTH of the interaction object
+        edge_y = interact_box['northmost']
+        edge_x = (interact_box['eastmost'] - interact_box['westmost']) / 2.0 + interact_box['westmost']
+        return (edge_x, edge_y)
+    elif player_needs_to_face == Direction.WEST.name:#this box is to the EAST of the interaction object
+        edge_x = interact_box['eastmost']
+        edge_y = (interact_box['southmost'] - interact_box['northmost']) / 2.0 + interact_box['northmost']
+        return (edge_x, edge_y)
+    else:#this box is to the WEST of the interaction object
+        edge_x = interact_box['westmost']
+        edge_y = (interact_box['southmost'] - interact_box['northmost']) / 2.0 + interact_box['northmost']
+        return (edge_x, edge_y)
+
 def player_interact_area(player) -> list:
     interact_boxes = four_side_interact_area(player)
     dir = player['direction']
@@ -64,7 +94,7 @@ def one_side_interact_area(place_obj) -> list:
     interact_box['southmost'] = interact_box['northmost']
     interact_box['northmost'] -= interact_distance
     interact_box['player_needs_to_face'] = 'SOUTH'
-    return [interact_box]
+    return {'NORTH_BOX':interact_box}
 
 def two_side_interact_area(place_obj) -> list:
     place_bounding_box = bounding_box(place_obj)
@@ -75,7 +105,7 @@ def two_side_interact_area(place_obj) -> list:
     south_interact_box['northmost'] = place_bounding_box['southmost']
     south_interact_box['southmost'] += interact_distance
     south_interact_box['player_needs_to_face'] = 'NORTH'
-    interact_boxes = [interact_boxes[0], south_interact_box]
+    interact_boxes['SOUTH_BOX'] = south_interact_box
     return interact_boxes
 
 def four_side_interact_area(place_obj:dict) -> dict:
@@ -90,24 +120,33 @@ def four_side_interact_area(place_obj:dict) -> dict:
     east_interact_box['westmost'] = place_bounding_box['eastmost']
     east_interact_box['eastmost'] += interact_distance
     east_interact_box['player_needs_to_face'] = 'WEST'
-    interact_boxes.append(east_interact_box)
-    interact_boxes.append(west_interact_box)
+    interact_boxes['WEST_BOX'] = west_interact_box
+    interact_boxes['EAST_BOX'] = east_interact_box
     return interact_boxes
 
-def overlap(player, interact_box):
-        return (
-            interact_box['northmost'] <= player['bounding_box']['northmost'] <= interact_box['southmost'] and (
-                (interact_box['westmost'] <= player['bounding_box']['westmost'] <= interact_box['eastmost']) 
-                or 
-                (interact_box['westmost'] <= player['bounding_box']['eastmost'] <= interact_box['eastmost'])
-            )
-            or
-            interact_box['northmost'] <= player['bounding_box']['southmost'] <= interact_box['southmost'] and (
-                (interact_box['westmost'] <= player['bounding_box']['westmost'] <= interact_box['eastmost']) 
-                or 
-                (interact_box['westmost'] <= player['bounding_box']['eastmost'] <= interact_box['eastmost'])
-            )
+def player_overlap_with_interact_box(player, interact_box):
+   return not (
+            player['bounding_box']['westmost'] > interact_box['eastmost'] or\
+            player['bounding_box']['northmost'] > interact_box['southmost'] or\
+            player['bounding_box']['eastmost'] < interact_box['westmost'] or\
+            player['bounding_box']['southmost'] < interact_box['northmost']
         )
+
+
+def can_interact_in_box(player, interact_box) -> bool:
+    """Returns whether `player` overlaps with interact_box
+
+    Args:
+        player (dict): player
+        interact_box (dict): interact box
+
+    Returns:
+        bool: Whether the player can interact in box
+    """
+    player['bounding_box'] = bounding_box(place=player)
+    if player_overlap_with_interact_box(player=player, interact_box=interact_box) and player_directions[player['direction']] == interact_box['player_needs_to_face']:
+        return True
+    return False
 
 def can_interact_player(player, place_obj) -> bool:
     """Returns whether the `player` object can interact with the `place_obj` based on their interact boxes
@@ -120,7 +159,7 @@ def can_interact_player(player, place_obj) -> bool:
         bool: whether the player and the place can interact
     """
     for interact_box in place_obj['interact_boxes']:
-        if overlap(player=player, interact_box=interact_box) and player_directions[player['direction']] == interact_box['player_needs_to_face']:
+        if player_overlap_with_interact_box(player=player, interact_box=interact_box) and player_directions[player['direction']] == interact_box['player_needs_to_face']:
             return True
     return False
 
@@ -160,15 +199,15 @@ def add_interact_boxes_to_obs(obs) -> dict:
                 obj_dict["interact_boxes"] = four_side_interact_area(obj_dict)
             elif object_name == "carts":
                 possible_boxes = four_side_interact_area(obj_dict)
-                obj_dir = player_directions[obj_dict['direction']]
-                if obj_dir == 'NORTH':
-                    obj_dict["interact_boxes"] = [possible_boxes[1]]
-                elif obj_dir == 'SOUTH':
-                    obj_dict["interact_boxes"] = [possible_boxes[0]]
-                elif obj_dir == 'WEST':
-                    obj_dict["interact_boxes"] = [possible_boxes[2]]
-                else:
-                    obj_dict["interact_boxes"] = [possible_boxes[3]]
+                obj_dir = obj_dict['direction']
+                if obj_dir == Direction.NORTH:#can be interacted with from the SOUTH
+                    obj_dict["interact_boxes"] = {'SOUTH_BOX':possible_boxes['SOUTH_BOX']}
+                elif obj_dir == Direction.SOUTH:#can be interacted with from the NORTH
+                    obj_dict["interact_boxes"] = {'NORTH_BOX':possible_boxes['NORTH_BOX']}
+                elif obj_dir == Direction.WEST:#can be interacted with from the EAST
+                    obj_dict["interact_boxes"] = {'EAST_BOX':possible_boxes['EAST_BOX']}
+                else:#can be interacted with from the WEST
+                    obj_dict["interact_boxes"] = {'WEST_BOX':possible_boxes['SOUTH_BOX']}
             elif object_name == "shelves":
                 obj_dict['interact_boxes'] = two_side_interact_area(obj_dict)
             else:
@@ -177,11 +216,16 @@ def add_interact_boxes_to_obs(obs) -> dict:
 
 if __name__ == "__main__":
     # run this to test adding interact boxes to objects in env.json (json version of the env object)
-    f = open("env.json")
+    # Get the path to the current file
+    current_file_path = Path(__file__)
+
+    # Get the folder containing the current file
+    dir = current_file_path.parent
+    f = open(dir / "env.json")
     obs = json.load(f)
     # test adding interact boxes to each object in the environment
     obs = add_interact_boxes_to_obs(obs)
-    with open('env_interact_boxes.json', 'w') as file:
+    with open(dir / 'env_interact_boxes.json', 'w') as file:
     # Write the dictionary to the JSON file
         json.dump(obs, file, indent=4)
 
