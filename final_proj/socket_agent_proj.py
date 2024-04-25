@@ -238,7 +238,7 @@ class Agent:
         
 
         if is_item: # locally adjust to make sure we can interact with the target item
-            self.reactive_nav(goal=interact_box, is_box=True)
+            self.approach_interact(goal=interact_box)
 
     
     def nav(self, goal, is_item=True):
@@ -255,6 +255,63 @@ class Agent:
         path = self.astar_planner.astar(start=tuple(player_location), goal=goal, map_width=MAP_WIDTH, map_height=MAP_HEIGHT, objs=objs, is_item=is_item)
         return path # this returns a path of x, y locations that the agent will go through
     
+    
+    
+    def approach_interact(self, goal):
+        """Purely reactie navigation
+
+        Args:
+            goal (_type_): a location in an interact_box
+        """
+        ##############################################
+        ## The old reactive navigation code is below##
+        ##############################################
+        target = "x"
+        reached_x = False
+        reached_y = False
+        while True:
+            player = self.env['observation']['players'][self.agent_id]
+
+            x_dist = player['position'][0] - goal['westmost']
+            y_dist = player['position'][1] - goal['northmost']
+            if can_interact_in_box(player=player, interact_box=goal):
+                reached_x = True
+                reached_y = True
+            else:
+                x_dist = player['position'][0] - goal[0]
+                y_dist = player['position'][1] - goal[1]
+
+            if abs(x_dist) < STEP:
+                reached_x = True
+            if abs(y_dist) < STEP:
+                reached_y = True
+            if reached_x and reached_y:
+                break
+
+            if target == "x":
+                if x_dist < -STEP:
+                    command = Direction.EAST
+                elif x_dist > STEP:
+                    command = Direction.WEST
+                else:
+                    reached_y = False
+                    target = "y"
+                    continue
+            else:
+                if y_dist < -STEP:
+                    command = Direction.SOUTH
+                elif y_dist > STEP:
+                    command = Direction.NORTH
+                else:
+                    reached_x = False
+                    target = "x"
+                    continue
+
+            while approach_to_interact(player, self.env, command, STEP):
+                command = Direction((command.value + 1) % 4)
+            self.execute(action=command.name)
+    
+    
     def reactive_nav(self, goal, is_box=False):
         """Purely reactie navigation
 
@@ -267,6 +324,7 @@ class Agent:
         target = "x"
         reached_x = False
         reached_y = False
+        stuck = 0 # stuck for timestep
         while True:
             player = self.env['observation']['players'][self.agent_id]
 
@@ -308,8 +366,19 @@ class Agent:
 
             while project_collision(player, self.env, command, STEP):
                 command = Direction((command.value + 1) % 4)
+                stuck += 1
             self.execute(action=command.name)
 
+    def go_around_obstacle(self, player, env):
+        """Try to go around the obstacle
+
+        Args:
+            player (dict): player
+            env (dict): current env
+        """
+        #TODO: try to go around the obstacle. Making an "L" shaped manuver
+        pass
+    
     def step(self, step_location:list|tuple, player_id:int, backtrack:list):
         """Keep locally adjusting and stepping in the right direction so that `player` ends up `close_enough` to `step_location`. `step_location` should be only one step away
 
@@ -340,7 +409,7 @@ class Agent:
             elif player_y < goal_y and abs(player_y - goal_y) >= LOCATION_TOLERANCE:#player should go SOUTH
                 #self.execute(Direction.SOUTH.name)
                 self.reactive_nav(goal=step_location, is_box=False)
-            elif player_y < goal_y and abs(player_y - goal_y) >= LOCATION_TOLERANCE:#player should go NORTH
+            elif player_y > goal_y and abs(player_y - goal_y) >= LOCATION_TOLERANCE:#player should go NORTH
                 #self.execute(Direction.NORTH.name)
                 self.reactive_nav(goal=step_location, is_box=False)
         
