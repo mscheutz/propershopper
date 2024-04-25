@@ -182,13 +182,13 @@ class Agent:
             tuple[float, float]: the goal location
         """
         player_needs_to_face = box['player_needs_to_face']
-        if player_needs_to_face == Direction.SOUTH.name:
+        if player_needs_to_face == Direction.SOUTH:
             top_left = (box['westmost'],box['northmost'])
             return top_left
-        elif player_needs_to_face == Direction.NORTH.name:
+        elif player_needs_to_face == Direction.NORTH:
             bot_left = (box['westmost'],box['southmost'])
             return bot_left
-        elif player_needs_to_face == Direction.WEST.name:
+        elif player_needs_to_face == Direction.WEST:
             bot_right = (box['eastmost'],box['southmost'])
             return bot_right
         else:
@@ -311,11 +311,11 @@ class Agent:
                     continue
             
             original_command = command
-            while project_collision_with_orientation(player, self.env, command):# approach interact takes orientation into consideration.
+            while project_collision_with_orientation(player, self.env, command, dist=STEP):# approach interact takes orientation into consideration.
                 command = Direction(self.turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
                 stuck += 1
                 if stuck >= 10:#been stuck for too long, F it, take the 270 degree action
-                    self.execute(action=self.turn_ninety_degrees(self.turn_opposite_dir(original_command)))
+                    command = self.turn_ninety_degrees(self.turn_opposite_dir(original_command))
                     stuck = 0 #hopefully no longer stuck
             self.execute(action=command.name)
     
@@ -372,13 +372,13 @@ class Agent:
                     target = "x"
                     continue
             original_command = command
-            while project_collision(player, self.env, command):
+            while project_collision(player, self.env, command, dist=STEP):
                 command = Direction(self.turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
                 stuck += 1
                 if stuck >= 10:#been stuck for too long, it's probably a corner, F it, take the 270 degree action
-                    self.execute(action=self.turn_ninety_degrees(self.turn_opposite_dir(original_command)))
+                    command = self.turn_ninety_degrees(self.turn_opposite_dir(original_command))
                     stuck = 0 #hopefully no longer stuck
-            if player['direction'] == command.name:
+            if player['direction'] == command.value:
                 self.execute(action=command.name)# execute once if already facing that direction
             else:
                 self.execute(action=command.name)

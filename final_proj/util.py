@@ -93,7 +93,7 @@ def one_side_interact_area(place_obj) -> list:
     interact_box = copy.deepcopy(place_bounding_box)
     interact_box['southmost'] = interact_box['northmost']
     interact_box['northmost'] -= interact_distance
-    interact_box['player_needs_to_face'] = 'SOUTH'
+    interact_box['player_needs_to_face'] = Direction.SOUTH
     return {'NORTH_BOX':interact_box}
 
 def two_side_interact_area(place_obj) -> list:
@@ -104,7 +104,7 @@ def two_side_interact_area(place_obj) -> list:
     south_interact_box = copy.deepcopy(place_bounding_box)
     south_interact_box['northmost'] = place_bounding_box['southmost']
     south_interact_box['southmost'] += interact_distance
-    south_interact_box['player_needs_to_face'] = 'NORTH'
+    south_interact_box['player_needs_to_face'] = Direction.NORTH
     interact_boxes['SOUTH_BOX'] = south_interact_box
     return interact_boxes
 
@@ -115,11 +115,11 @@ def four_side_interact_area(place_obj:dict) -> dict:
     west_interact_box = copy.deepcopy(place_bounding_box)
     west_interact_box['eastmost'] = place_bounding_box['westmost']
     west_interact_box['westmost'] -= interact_distance
-    west_interact_box['player_needs_to_face'] = 'EAST'
+    west_interact_box['player_needs_to_face'] = Direction.EAST
     east_interact_box = copy.deepcopy(place_bounding_box)
     east_interact_box['westmost'] = place_bounding_box['eastmost']
     east_interact_box['eastmost'] += interact_distance
-    east_interact_box['player_needs_to_face'] = 'WEST'
+    east_interact_box['player_needs_to_face'] = Direction.WEST
     interact_boxes['WEST_BOX'] = west_interact_box
     interact_boxes['EAST_BOX'] = east_interact_box
     return interact_boxes
@@ -144,7 +144,7 @@ def can_interact_in_box(player, interact_box) -> bool:
         bool: Whether the player can interact in box
     """
     player['bounding_box'] = bounding_box(place=player)
-    if player_overlap_with_interact_box(player=player, interact_box=interact_box) and player_directions[player['direction']] == interact_box['player_needs_to_face']:
+    if player_overlap_with_interact_box(player=player, interact_box=interact_box) and player['direction'] == interact_box['player_needs_to_face'].value:
         return True
     return False
 

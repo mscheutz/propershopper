@@ -75,19 +75,21 @@ def project_collision_with_orientation(obj, state, direction: Direction, dist=0.
     for key, value in state['observation'].items():
         for item in value:
             if key == 'players':#for players, pretend that they are wider and taller than they actually are to stay away
-                if (obj_copy == item or (
-                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
-                    continue
                 if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
-                            item['position'][0], item['position'][1], item['width'] + buffer + 0.75, item['height'] + buffer + 0.75)):
-                    return True
-            else:
-                if (obj_copy == item or (
+                            item['position'][0], item['position'][1], item['width'] + buffer + 2* STEP, item['height'] + buffer + 2* STEP)):
+                    if not (obj_copy == item or (
                         'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
-                    continue
+                    
+                        print("projected collision with: ", {key})
+                        return True
+            else:
                 if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
                             item['position'][0], item['position'][1], item['width'] + buffer, item['height'] + buffer)):
-                    return True
+                    if not (obj_copy == item or (
+                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
+                    
+                        print("projected collision with: ", {key})
+                        return True
     return False
 
 def project_collision(obj, state, direction: Direction, dist=0.4, buffer=0.0):
@@ -125,19 +127,22 @@ def project_collision(obj, state, direction: Direction, dist=0.4, buffer=0.0):
     for key, value in state['observation'].items():
         for item in value:
             if key == 'players':#for players, pretend that they are wider and taller than they actually are to stay away
-                if (obj_copy == item or (
-                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
-                    continue
                 if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
-                            item['position'][0], item['position'][1], item['width'] + buffer + 0.75, item['height'] + buffer + 0.75)):
-                    return True
-            else:
-                if (obj_copy == item or (
+                            item['position'][0], item['position'][1], item['width'] + buffer + 2* STEP, item['height'] + buffer + 2* STEP)):
+                    if not (obj_copy == item or (
                         'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
-                    continue
+                    
+                        print("projected collision with: ", {key})
+                        return True
+            else:
+
                 if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
                             item['position'][0], item['position'][1], item['width'] + buffer, item['height'] + buffer)):
-                    return True
+                    if not (obj_copy == item or (
+                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
+                    
+                        print("projected collision with: ", {key})
+                        return True
     return False
 
 
