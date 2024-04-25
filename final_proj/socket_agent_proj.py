@@ -1,6 +1,7 @@
 
 import json
 import socket
+import random
 from copy import deepcopy
 
 import pandas as pd
@@ -11,9 +12,6 @@ from final_proj.util import get_geometry
 from helper import project_collision
 from util import *
 from final_proj.astar_path_planner import *
-
-
-STEP = 0.15 # the size of the player's step
 
 # todo: update with Helen's method for making interaction areas?
 def populate_locs(observation):
@@ -198,6 +196,12 @@ class Agent:
     
     
     def goto(self, goal:list|tuple|str, is_item=True):
+        """go to the goal, either a (x, y) of a string such as 'basket', 'register'
+
+        Args:
+            goal (list | tuple | str): _description_
+            is_item (bool, optional): _description_. Defaults to True.
+        """
         if goal is None:
             goal = self.goal
 
@@ -226,7 +230,7 @@ class Agent:
 
         if self.holding_container and self.container_type == 'cart':
             print(f"Agent {self.agent_id} going to location {goal} with cart")
-
+            path = []
             pass  # TODO: goto with cart. TA says it might be as simple as changing the player's shape. If it's too complicated we will skip it
         else:
             print(f"Agent {self.agent_id} planning a path to {goal} without cart")
@@ -238,7 +242,7 @@ class Agent:
         
 
         if is_item: # locally adjust to make sure we can interact with the target item
-            self.approach_interact(goal=interact_box)
+            self.locally_approach_interact(goal_box=interact_box)
 
     
     def nav(self, goal, is_item=True):
@@ -253,15 +257,15 @@ class Agent:
         player = self.env['observation']['players'][self.agent_id]
         player_location = player['position']
         path = self.astar_planner.astar(start=tuple(player_location), goal=goal, map_width=MAP_WIDTH, map_height=MAP_HEIGHT, objs=objs, is_item=is_item)
-        return path # this returns a path of x, y locations that the agent will go through
+        return path # this returns a path of x, y locations that the agent will go through without considering other players
     
     
     
-    def approach_interact(self, goal):
-        """Purely reactie navigation
+    def locally_approach_interact(self, goal_box):
+        """Reactie navigation to approach the interaction object when we are already very close to it (after basic navigation). Shouldn't be used when we are still potentially far.
 
         Args:
-            goal (_type_): a location in an interact_box
+            goal (dict): an interact_box
         """
         ##############################################
         ## The old reactive navigation code is below##
@@ -269,17 +273,15 @@ class Agent:
         target = "x"
         reached_x = False
         reached_y = False
+        stuck = 0 
         while True:
             player = self.env['observation']['players'][self.agent_id]
-
-            x_dist = player['position'][0] - goal['westmost']
-            y_dist = player['position'][1] - goal['northmost']
-            if can_interact_in_box(player=player, interact_box=goal):
+            goal_box_point = self.interact_box_to_goal_location(box=goal_box)
+            x_dist = player['position'][0] - goal_box_point[0]
+            y_dist = player['position'][1] - goal_box_point[1]
+            if can_interact_in_box(player=player, interact_box=goal_box):
                 reached_x = True
                 reached_y = True
-            else:
-                x_dist = player['position'][0] - goal[0]
-                y_dist = player['position'][1] - goal[1]
 
             if abs(x_dist) < STEP:
                 reached_x = True
@@ -306,9 +308,14 @@ class Agent:
                     reached_x = False
                     target = "x"
                     continue
-
-            while approach_to_interact(player, self.env, command, STEP):
-                command = Direction((command.value + 1) % 4)
+            
+            original_command = command
+            while project_collision_with_orientation(player, self.env, command):# approach interact takes orientation into consideration.
+                command = Direction(self.turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
+                stuck += 1
+                if stuck >= 10:#been stuck for too long, F it, take the 270 degree action
+                    self.execute(action=self.turn_ninety_degrees(self.turn_opposite_dir(original_command)))
+                    stuck = 0 #hopefully no longer stuck
             self.execute(action=command.name)
     
     
@@ -363,21 +370,58 @@ class Agent:
                     reached_x = False
                     target = "x"
                     continue
-
-            while project_collision(player, self.env, command, STEP):
-                command = Direction((command.value + 1) % 4)
+            original_command = command
+            while project_collision(player, self.env, command):
+                command = Direction(self.turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
                 stuck += 1
-            self.execute(action=command.name)
+                if stuck >= 10:#been stuck for too long, it's probably a corner, F it, take the 270 degree action
+                    self.execute(action=self.turn_ninety_degrees(self.turn_opposite_dir(original_command)))
+                    stuck = 0 #hopefully no longer stuck
+            if player['direction'] == command.name:
+                self.execute(action=command.name)# execute once if already facing that direction
+            else:
+                self.execute(action=command.name)
+                self.execute(action=command.name)
 
-    def go_around_obstacle(self, player, env):
-        """Try to go around the obstacle
+    def turn_opposite_dir(self, dir:Direction) -> Direction:
+        """Turn 180 degrees with respect to the given 
 
         Args:
-            player (dict): player
-            env (dict): current env
+            command (Direction): the direction command whose ninety degree direction we want to find
+        Returns:
+            returns the 90 degrees direction
         """
-        #TODO: try to go around the obstacle. Making an "L" shaped manuver
-        pass
+        if dir == Direction.NORTH:
+            return Direction.SOUTH
+        if dir == Direction.SOUTH:
+            return Direction.NORTH
+        if dir == Direction.EAST:
+            return Direction.WEST
+        else:
+            return Direction.EAST
+
+    def turn_ninety_degrees(self, dir:Direction) -> Direction:
+        """Turn 90 degrees clockwise with respect to the given 
+
+        Args:
+            command (Direction): the direction command whose ninety degree direction we want to find
+        Returns:
+            returns the 90 degrees direction
+        """
+        turned_dir = Direction((dir.value + 2) % 5)
+        if turned_dir == Direction.NONE:
+            return Direction.SOUTH
+        return turned_dir
+
+    # def go_around_obstacle(self, player, env):
+    #     """Try to go around the obstacle
+
+    #     Args:
+    #         player (dict): player
+    #         env (dict): current env
+    #     """
+    #     #TODO: try to go around the obstacle. Making an "L" shaped manuver
+    #     pass
     
     def step(self, step_location:list|tuple, player_id:int, backtrack:list):
         """Keep locally adjusting and stepping in the right direction so that `player` ends up `close_enough` to `step_location`. `step_location` should be only one step away
@@ -433,12 +477,10 @@ class Agent:
     # TODO use other functions to complete checkout
     def exit(self):
         print(f"Agent {self.agent_id} exiting")
-        self.goto([2, 12.5], is_item=False)
+        self.goto(goal='register 0', is_item=True)
 
-        # pick_up_and_put_in(shelf_direction = "NORTH")
-        # self.add_to_cart()
         
-        self.goto([-0.8, 15.6])
+        self.goto([-0.6, 3.0], is_item=False)#upper exit
 
         self.done = True
 
