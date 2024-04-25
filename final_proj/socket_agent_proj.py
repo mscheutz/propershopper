@@ -81,6 +81,7 @@ class Agent:
         self.astar_planner = Astar_agent(socket_game=conn, env=env)
 
     def transition(self):
+        self.execute(action='NOP') # this updates self.env
         if self.done:  # If we've left the store
             self.execute("NOP")  # Do nothing
 
