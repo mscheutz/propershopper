@@ -1,7 +1,7 @@
 import decimal
 import math
 from copy import deepcopy
-
+from final_proj.constants import *
 from enums.direction import Direction
 
 
@@ -35,12 +35,81 @@ def can_interact_default(obj, player, range=0.5):
     return False
 
 
-def project_collision(obj, state, direction: Direction, dist=0.4):
+
+def project_collision_with_orientation(obj, state, direction: Direction, dist=0.4, buffer=0.0):#orientation matters
+    """Project collision while taking the obj's orientation into account. This should only be used when the player is very close to the target item they want to interact with. Otherwise, the player might get stuck turning back and forth in a corner formed by static obstacles 
+
+    Args:
+        obj (dict): most likely the player
+        state (dict): game state
+        direction (Direction): directional command
+        dist (float, optional): distance the obj is about to travel. Defaults to 0.4.
+        buffer (float, optional): buffer between objects in the env. Defaults to 0.0.
+
+    Returns:
+        _type_: _description_
+    """
+    obj_copy = deepcopy(obj)
+
+    if direction == Direction.NORTH:
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][1] -= dist
+        if obj_copy['position'][1] < 2.1:
+            return True
+    elif direction == Direction.EAST:
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][0] += dist
+        if obj_copy['position'][0] > 18.5:
+            return True
+    elif direction == Direction.SOUTH:
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][1] += dist
+        if obj_copy['position'][1] > 24:
+            return True
+    elif direction == Direction.WEST:
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][0] -= dist
+        if obj_copy['position'][0] < 0.55:
+            return True
+
+    for key, value in state['observation'].items():
+        for item in value:
+            if key == 'players':#for players, pretend that they are wider and taller than they actually are to stay away
+                if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
+                            item['position'][0], item['position'][1], item['width'] + buffer + 2* STEP, item['height'] + buffer + 2* STEP)):
+                    if not (obj_copy == item or (
+                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
+                    
+                        print("projected collision with: ", {key})
+                        return True
+            else:
+                if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
+                            item['position'][0], item['position'][1], item['width'] + buffer, item['height'] + buffer)):
+                    if not (obj_copy == item or (
+                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
+                    
+                        print("projected collision with: ", {key})
+                        return True
+    return False
+
+def project_collision(obj, state, direction: Direction, dist=0.4, buffer=0.0):
+    """Project collision. This should only be used when the player is likely far from the target item they want to interact with. Otherwise, the player might get stuck turning back and forth in a corner formed by static obstacles 
+
+    Args:
+        obj (dict): most likely the player
+        state (dict): game state
+        direction (Direction): directional command
+        dist (float, optional): distance the obj is about to travel. Defaults to 0.4.
+        buffer (float, optional): buffer between objects in the env. Defaults to 0.0.
+
+    Returns:
+        _type_: _description_
+    """
     obj_copy = deepcopy(obj)
 
     if direction == Direction.NORTH:
         obj_copy['position'][1] -= dist
-        if obj_copy['position'][1] < 2:
+        if obj_copy['position'][1] < 2.1:
             return True
     elif direction == Direction.EAST:
         obj_copy['position'][0] += dist
@@ -52,16 +121,28 @@ def project_collision(obj, state, direction: Direction, dist=0.4):
             return True
     elif direction == Direction.WEST:
         obj_copy['position'][0] -= dist
-        if obj_copy['position'][0] < 2:
+        if obj_copy['position'][0] < 0.55:
             return True
 
     for key, value in state['observation'].items():
         for item in value:
-            if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
-                        item['position'][0], item['position'][1], item['width'], item['height'])):
-                if not (obj_copy == item or (
+            if key == 'players':#for players, pretend that they are wider and taller than they actually are to stay away
+                if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
+                            item['position'][0], item['position'][1], item['width'] + buffer + 2* STEP, item['height'] + buffer + 2* STEP)):
+                    if not (obj_copy == item or (
                         'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
-                    return True
+                    
+                        print("projected collision with: ", {key})
+                        return True
+            else:
+
+                if (overlap(obj_copy['position'][0], obj_copy['position'][1], obj_copy['width'], obj_copy['height'],
+                            item['position'][0], item['position'][1], item['width'] + buffer, item['height'] + buffer)):
+                    if not (obj_copy == item or (
+                        'index' in item.keys() and 'index' in obj_copy.keys() and item['index'] == obj_copy['index'])):
+                    
+                        print("projected collision with: ", {key})
+                        return True
     return False
 
 
@@ -69,21 +150,25 @@ def project_collision_dyn(obj, state, direction: Direction, dist=0.4, buffer=0):
     obj_copy = deepcopy(obj)
 
     if direction == Direction.NORTH:
-        obj_copy['position'][1] -= dist
-        if obj_copy['position'][1] < 2:
-            return 1
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][1] -= dist
+        if obj_copy['position'][1] < 2.1:
+            return True
     elif direction == Direction.EAST:
-        obj_copy['position'][0] += dist
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][0] += dist
         if obj_copy['position'][0] > 18.5:
-            return 1
+            return True
     elif direction == Direction.SOUTH:
-        obj_copy['position'][1] += dist
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][1] += dist
         if obj_copy['position'][1] > 24:
-            return 1
+            return True
     elif direction == Direction.WEST:
-        obj_copy['position'][0] -= dist
-        if obj_copy['position'][0] < 2:
-            return 1
+        if obj_copy['direction'] == direction.value:#object moves
+            obj_copy['position'][0] -= dist
+        if obj_copy['position'][0] < 0.55:
+            return True
 
     for key, value in state['observation'].items():
         for item in value:

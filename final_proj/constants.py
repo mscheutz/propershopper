@@ -8,9 +8,6 @@ registerReturns_2 = [2, 9.5]
 exit_pos = [-0.6, 3.0]
 default_start_pos = [1.5, 15.6]
 interact_distance = 0.25
-cart_pos_left = [1, 18.5] # The position of the cart in the environment from [1, 2] in x, and y = 18.5
-cart_pos_right = [2, 18.5]
-basketReturn = []
 counter = []
 loc = [1, 17.5]
 register_region_x = 1 + 2.25
@@ -41,6 +38,7 @@ left_cartReturns = {
             ]
         }
 
+example_cart = {'position': [1.2720096174545914, 18.013690800070798], 'direction': 3, 'capacity': 12, 'owner': 0, 'last_held': 0, 'contents': [], 'contents_quant': [], 'purchased_contents': [], 'purchased_quant': [], 'width': 0.75, 'height': 0.4}
 cartReturns = [2, 18.5]
 basketReturns = [3.5, 18.5]
 registerReturns_1 = [2, 4.5]
@@ -48,6 +46,7 @@ registerReturns_2 = [2, 9.5]
 
 offset = 1
 
+STEP = 0.15 # the size of the player's step
 MAP_WIDTH, MAP_HEIGHT = 20, 25
 LOCATION_TOLERANCE = 0.15
 BACKTRACK_TOLERANCE = 3 * LOCATION_TOLERANCE

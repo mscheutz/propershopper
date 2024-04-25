@@ -27,7 +27,7 @@ class Node:
 
 # By Nicholas Swift via https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
 # Modifications by Marlow Fawn
-def astar(goal, player, state):
+def astar(goal, player, state) -> list:
     """Returns a list of tuples as a path from the given start to the given end in the given maze"""
     player_copy = deepcopy(player)
     goal_copy = deepcopy(goal)
