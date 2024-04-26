@@ -79,7 +79,7 @@ def update_position_to_center(obj_pose):
     return obj_pose
 
 
-class Astar_agent:
+class HighLevelPlanner:
     def __init__(self, socket_game, env):
         self.shopping_list = env['observation']['players'][0]['shopping_list']
         self.shopping_quant = env['observation']['players'][0]['list_quant']
@@ -230,6 +230,8 @@ class Astar_agent:
         while current:
             path.append(current)
             current = came_from[current]
+            if current == start_region:
+                break
         path.reverse()
         return path
 
@@ -275,7 +277,7 @@ if __name__=="__main__":
     game_state = json.loads(state)
     shopping_list = game_state['observation']['players'][0]['shopping_list']
     shopping_quant = game_state['observation']['players'][0]['list_quant']
-    agent = Astar_agent(socket_game=sock_game, env=game_state)
+    agent = HighLevelPlanner(socket_game=sock_game, env=game_state)
     print(shopping_list)
 
 

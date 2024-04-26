@@ -39,11 +39,11 @@ def euclidean_distance(pos1, pos2):
     # Calculate Euclidean distance between two points
     return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)**0.5
 
-def calculate_crowdedness_factor(player:dict, box:dict, observation:dict) -> float:
+def calculate_crowdedness_factor(player_id:int, box:dict, observation:dict) -> float:
     """Given an observation, a player, and a box region, calculate how crowded that region is
 
     Args:
-        player (dict): the agent excluded in the calculation
+        player_id (int): the agent excluded in the calculation
         box (dict): the region of interest {"westmost":float, "southmost":float, "eastmost":float, "northmost":float}
         observation (dict): observation containing the players in the map
     Returns:
@@ -52,17 +52,17 @@ def calculate_crowdedness_factor(player:dict, box:dict, observation:dict) -> flo
     area = abs(box['westmost'] - box['eastmost']) * abs(box['northmost'] - box['southmost'])
     occupied_area = 0
     for p in observation['players']:
-        if p['index'] == player['index']: # don't count our player
+        if p['index'] == player_id: # don't count our player
             continue
         if obj_overlap_with_box(p, box):
             occupied_area += p['width']*p['height']
     for c in observation['carts']:
-        if c['owner'] == player['index']: # don't count our cart
+        if c['owner'] == player_id: # don't count our cart
             continue
         if obj_overlap_with_box(c, box):
             occupied_area += c['width'] * c['height']
     for b in observation['baskets']:
-        if b['owner'] == player['index']: # don't count our basket
+        if b['owner'] == player_id: # don't count our basket
             continue
         if obj_overlap_with_box(b, box):
             occupied_area += b['width'] * b['height']

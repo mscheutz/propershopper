@@ -12,6 +12,7 @@ from final_proj.util import get_geometry
 from helper import project_collision
 from util import *
 from final_proj.fast_high_level_astar import *
+from box_regions import *
 
 # todo: update with Helen's method for making interaction areas?
 def populate_locs(observation):
@@ -78,7 +79,7 @@ class Agent:
         self.container_type = ''
         self.holding_container = False
         self.holding_food = None
-        self.astar_planner = Astar_agent(socket_game=conn, env=env)
+        self.planner = HighLevelPlanner(socket_game=conn, env=env)
 
     def transition(self):
         self.execute(action='NOP') # this updates self.env
@@ -209,18 +210,25 @@ class Agent:
         if self.holding_container and self.container_type == 'cart':
             print(f"Agent {self.agent_id} going to location {goal} with cart")
             path = []
-            pass  # TODO: goto with cart. TA says it might be as simple as changing the player's shape. If it's too complicated we will skip it
+            pass  # TODO: goto with cart. TA says it might be as simple as changing the player's shape as long as they are holding a cart and change it back once they are not. If it's too complicated we will skip it
         else:
             print(f"Agent {self.agent_id} planning a path to {goal} without cart")
-            path = self.nav(goal, is_item=is_item)
+            path = self.planner.astar(
+                player_id=self.agent_id,
+                start=self.env['observation']['players'][self.agent_id],
+                goal=goal,
+                obs=self.env['observation']
+            )
             print(f"Agent {self.agent_id} going to location {goal} without cart")
         
-        for intermediate_target_location in path: # astar planner only gets us close to the goal
-            self.step(step_location=intermediate_target_location, player_id=self.agent_id, backtrack=[])
+        for box_region in path:
+            self.reactive_nav(goal=box_region.midpoint, is_box=False)
         
-
-        if is_item: # locally adjust to make sure we can interact with the target item
-            self.locally_approach_interact(goal_box=interact_box)
+        # we should now be in the same region as the goal (x, y) location
+        if is_item:
+            self.reactive_nav(goal=interact_box, is_box=True)
+        else:
+            self.reactive_nav(goal=goal, is_box=False)
 
     
     def interact_box_to_goal_location(self, box:dict) -> tuple[float, float]:
@@ -245,80 +253,7 @@ class Agent:
         else:
             bot_left = (box['westmost'],box['southmost'])
             return bot_left
-
-
-    def nav(self, goal, is_item=True):
-        """The default navigation
-
-        Args:
-            goal (_type_): (x, y)
-
-        Returns:
-            _type_: a list of (x, y) to goal
-        """
-        player = self.env['observation']['players'][self.agent_id]
-        player_location = player['position']
-        path = self.astar_planner.astar(start=tuple(player_location), goal=goal, map_width=MAP_WIDTH, map_height=MAP_HEIGHT, objs=objs, is_item=is_item)
-        return path # this returns a path of x, y locations that the agent will go through without considering other players
     
-
-    
-    def locally_approach_interact(self, goal_box):
-        """Reactie navigation to approach the interaction object when we are already very close to it (after basic navigation). Shouldn't be used when we are still potentially far.
-
-        Args:
-            goal (dict): an interact_box
-        """
-        ##############################################
-        ## The old reactive navigation code is below##
-        ##############################################
-        target = "x"
-        reached_x = False
-        reached_y = False
-        stuck = 0 
-        while True:
-            player = self.env['observation']['players'][self.agent_id]
-            goal_box_point = self.interact_box_to_goal_location(box=goal_box)
-            x_dist = player['position'][0] - goal_box_point[0]
-            y_dist = player['position'][1] - goal_box_point[1]
-            if can_interact_in_box(player=player, interact_box=goal_box):
-                reached_x = True
-                reached_y = True
-
-            if abs(x_dist) < STEP:
-                reached_x = True
-            if abs(y_dist) < STEP:
-                reached_y = True
-            if reached_x and reached_y:
-                break
-
-            if target == "x":
-                if x_dist < -STEP:
-                    command = Direction.EAST
-                elif x_dist > STEP:
-                    command = Direction.WEST
-                else:
-                    reached_y = False
-                    target = "y"
-                    continue
-            else:
-                if y_dist < -STEP:
-                    command = Direction.SOUTH
-                elif y_dist > STEP:
-                    command = Direction.NORTH
-                else:
-                    reached_x = False
-                    target = "x"
-                    continue
-            
-            original_command = command
-            while project_collision_with_orientation(player, self.env, command, dist=STEP):# approach interact takes orientation into consideration.
-                command = Direction(self._turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
-                stuck += 1
-                if stuck >= 10:#been stuck for too long, F it, take the 270 degree action
-                    command = self._turn_ninety_degrees(self._turn_opposite_dir(original_command))
-                    stuck = 0 #hopefully no longer stuck
-            self.execute(action=command.name)
     
     
     def reactive_nav(self, goal, is_box=False):
@@ -338,11 +273,11 @@ class Agent:
             player = self.env['observation']['players'][self.agent_id]
 
             if is_box:
-                x_dist = player['position'][0] - goal['westmost']
-                y_dist = player['position'][1] - goal['northmost']
+                goal_loc = self.interact_box_to_goal_location(box=goal)
+                x_dist = player['position'][0] - goal_loc['westmost']
+                y_dist = player['position'][1] - goal_loc['northmost']
                 if can_interact_in_box(player=player, interact_box=goal):
-                    reached_x = True
-                    reached_y = True
+                    break
             else:
                 x_dist = player['position'][0] - goal[0]
                 y_dist = player['position'][1] - goal[1]
@@ -426,7 +361,7 @@ class Agent:
         """
         goal_x, goal_y = step_location
         player_x, player_y = self.env['observation']["players"][player_id]['position']
-        while not self.astar_planner.is_close_enough(current=self.env['observation']["players"][player_id]['position'], goal=step_location, tolerance=LOCATION_TOLERANCE, is_item=False):#deals with stochasticity: keep locally adjusting to the right location until it's close enough
+        while not self.planner.is_close_enough(current=self.env['observation']["players"][player_id]['position'], goal=step_location, tolerance=LOCATION_TOLERANCE, is_item=False):#deals with stochasticity: keep locally adjusting to the right location until it's close enough
             # compare previous position with current position to determine if a location needs to be saved in the player's backtracking trace 
             prev_x = player_x
             prev_y = player_y
