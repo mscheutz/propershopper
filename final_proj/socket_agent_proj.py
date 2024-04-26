@@ -11,7 +11,7 @@ from enums.direction import Direction
 from final_proj.util import get_geometry
 from helper import project_collision
 from util import *
-from final_proj.astar_path_planner import *
+from final_proj.fast_high_level_astar import *
 
 # todo: update with Helen's method for making interaction areas?
 def populate_locs(observation):
@@ -127,7 +127,7 @@ class Agent:
                 self.goal = 'basketReturn 0'
                 self.goto(goal='basketReturn 0', is_item=True)
             else:
-                self.goal = 'basket'
+                self.goal = 'basket'# we have gotten a basket before, it's somewhere in the environment
                 self.goto(goal=f'basket {self.container_id}', is_item=True)
             self.execute('INTERACT')
             self.execute('INTERACT')
@@ -152,11 +152,11 @@ class Agent:
         Args:
             shopping_list (list[tuple]): shopping list of (item, quantity)
         """
-        #TODO: add optimization strategy
+        #TODO: replace with optimization strategy
         return shopping_list.pop(0)
     
     def update_container(self, container='basket'):
-        """Check if we are responsible for any `container`. Either a cart or a basket
+        """Check if we are responsible for any `container` and update container related status. Either a cart or a basket
 
         Args:
             container (_type_): either a cart or a basket
@@ -171,37 +171,14 @@ class Agent:
                 self.container_id = i
                 self.container_type = container
                 return
-
-    def interact_box_to_goal_location(self, box:dict) -> tuple[float, float]:
-        """Given an interact box, determine which goal location within the box to aim for
-
-        Args:
-            box (dict): interact box
-
-        Returns:
-            tuple[float, float]: the goal location
-        """
-        player_needs_to_face = box['player_needs_to_face']
-        if player_needs_to_face == Direction.SOUTH:
-            top_left = (box['westmost'],box['northmost'])
-            return top_left
-        elif player_needs_to_face == Direction.NORTH:
-            bot_left = (box['westmost'],box['southmost'])
-            return bot_left
-        elif player_needs_to_face == Direction.WEST:
-            bot_right = (box['eastmost'],box['southmost'])
-            return bot_right
-        else:
-            bot_left = (box['westmost'],box['southmost'])
-            return bot_left
     
     
     def goto(self, goal:list|tuple|str, is_item=True):
         """go to the goal, either a (x, y) of a string such as 'basket', 'register'
 
         Args:
-            goal (list | tuple | str): _description_
-            is_item (bool, optional): _description_. Defaults to True.
+            goal (list | tuple | str): (x, y) or strings such as 'strawberry', 'basket'
+            is_item (bool, optional): if the goal is an item. Set False for (x, y). Defaults to True.
         """
         if goal is None:
             goal = self.goal
@@ -238,7 +215,7 @@ class Agent:
             path = self.nav(goal, is_item=is_item)
             print(f"Agent {self.agent_id} going to location {goal} without cart")
         
-        for intermediate_target_location in path:
+        for intermediate_target_location in path: # astar planner only gets us close to the goal
             self.step(step_location=intermediate_target_location, player_id=self.agent_id, backtrack=[])
         
 
@@ -246,6 +223,30 @@ class Agent:
             self.locally_approach_interact(goal_box=interact_box)
 
     
+    def interact_box_to_goal_location(self, box:dict) -> tuple[float, float]:
+        """Given an interact box, determine which goal location within the box to aim for
+
+        Args:
+            box (dict): interact box
+
+        Returns:
+            tuple[float, float]: the goal location
+        """
+        player_needs_to_face = box['player_needs_to_face']
+        if player_needs_to_face == Direction.SOUTH:
+            top_left = (box['westmost'],box['northmost'])
+            return top_left
+        elif player_needs_to_face == Direction.NORTH:
+            bot_left = (box['westmost'],box['southmost'])
+            return bot_left
+        elif player_needs_to_face == Direction.WEST:
+            bot_right = (box['eastmost'],box['southmost'])
+            return bot_right
+        else:
+            bot_left = (box['westmost'],box['southmost'])
+            return bot_left
+
+
     def nav(self, goal, is_item=True):
         """The default navigation
 
@@ -260,7 +261,7 @@ class Agent:
         path = self.astar_planner.astar(start=tuple(player_location), goal=goal, map_width=MAP_WIDTH, map_height=MAP_HEIGHT, objs=objs, is_item=is_item)
         return path # this returns a path of x, y locations that the agent will go through without considering other players
     
-    
+
     
     def locally_approach_interact(self, goal_box):
         """Reactie navigation to approach the interaction object when we are already very close to it (after basic navigation). Shouldn't be used when we are still potentially far.
@@ -312,10 +313,10 @@ class Agent:
             
             original_command = command
             while project_collision_with_orientation(player, self.env, command, dist=STEP):# approach interact takes orientation into consideration.
-                command = Direction(self.turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
+                command = Direction(self._turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
                 stuck += 1
                 if stuck >= 10:#been stuck for too long, F it, take the 270 degree action
-                    command = self.turn_ninety_degrees(self.turn_opposite_dir(original_command))
+                    command = self._turn_ninety_degrees(self._turn_opposite_dir(original_command))
                     stuck = 0 #hopefully no longer stuck
             self.execute(action=command.name)
     
@@ -373,18 +374,17 @@ class Agent:
                     continue
             original_command = command
             while project_collision(player, self.env, command, dist=STEP):
-                command = Direction(self.turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
+                command = Direction(self._turn_ninety_degrees(dir=command)) # take the 90 degrees action instead
                 stuck += 1
                 if stuck >= 10:#been stuck for too long, it's probably a corner, F it, take the 270 degree action
-                    command = self.turn_ninety_degrees(self.turn_opposite_dir(original_command))
-                    stuck = 0 #hopefully no longer stuck
+                    command = self._turn_ninety_degrees(self._turn_opposite_dir(original_command))
             if player['direction'] == command.value:
                 self.execute(action=command.name)# execute once if already facing that direction
             else:
                 self.execute(action=command.name)
                 self.execute(action=command.name)
 
-    def turn_opposite_dir(self, dir:Direction) -> Direction:
+    def _turn_opposite_dir(self, dir:Direction) -> Direction:
         """Turn 180 degrees with respect to the given 
 
         Args:
@@ -401,7 +401,7 @@ class Agent:
         else:
             return Direction.EAST
 
-    def turn_ninety_degrees(self, dir:Direction) -> Direction:
+    def _turn_ninety_degrees(self, dir:Direction) -> Direction:
         """Turn 90 degrees clockwise with respect to the given 
 
         Args:
@@ -414,15 +414,7 @@ class Agent:
             return Direction.SOUTH
         return turned_dir
 
-    # def go_around_obstacle(self, player, env):
-    #     """Try to go around the obstacle
-
-    #     Args:
-    #         player (dict): player
-    #         env (dict): current env
-    #     """
-    #     #TODO: try to go around the obstacle. Making an "L" shaped manuver
-    #     pass
+    
     
     def step(self, step_location:list|tuple, player_id:int, backtrack:list):
         """Keep locally adjusting and stepping in the right direction so that `player` ends up `close_enough` to `step_location`. `step_location` should be only one step away

@@ -92,7 +92,7 @@ def project_collision_with_orientation(obj, state, direction: Direction, dist=0.
                         return True
     return False
 
-def project_collision(obj, state, direction: Direction, dist=0.4, buffer=0.0):
+def project_collision(obj:dict|list|tuple, state, direction: Direction, dist=0.4, buffer=0.0):
     """Project collision. This should only be used when the player is likely far from the target item they want to interact with. Otherwise, the player might get stuck turning back and forth in a corner formed by static obstacles 
 
     Args:

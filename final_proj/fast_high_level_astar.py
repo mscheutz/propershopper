@@ -1,14 +1,14 @@
 
 import numpy as np
-from utils import recv_socket_data
 import json
 from queue import PriorityQueue
 
 import json
 import socket
 
-from utils import recv_socket_data
+
 from util import *
+from box_regions import *
 
 cartReturns = [2, 18.5]
 basketReturns = [3.5, 18.5]
@@ -93,106 +93,72 @@ class Astar_agent:
         self.last_action = "NOP"
         self.current_direction = self.player['direction']
         self.size = [0.6, 0.4]
-
-        
-
-    def step(self, action):
-        action = "0 " + action
-        self.game.send(str.encode(action))  # send action to env
-        output = recv_socket_data(self.game)  # get observation from env
-        if output:
-            output = json.loads(output)
-            self.obs = output['observation']
-            self.last_action = action
-            self.player = self.obs['players'][0]
-        return output
-    
-    def heuristic(self, a, b):
-        """Calculate the Manhattan distance from point a to point b."""
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
-
-
-    def overlap(self, x1, y1, width_1, height_1, x2, y2, width_2, height_2):
-        return not (x1 > x2 + width_2 or x2 > x1 + width_1 or y1 > y2 + height_2 or y2 > y1 + height_1)
-
-    def objects_overlap(self, x1, y1, width_1, height_1, x2, y2, width_2, height_2):
-        return self.overlap(x1, y1, width_1, height_1, x2, y2, width_2, height_2)
-    
-    def collision(self, x, y, width, height, obj):
-        """
-        Check if a rectangle defined by (x, y, width, height) does NOT intersect with an object
-        and ensure the rectangle stays within the map boundaries.
-
-        Parameters:
-            x (float): The x-coordinate of the rectangle's top-left corner.
-            y (float): The y-coordinate of the rectangle's top-left corner.
-            width (float): The width of the rectangle.
-            height (float): The height of the rectangle.
-            obj (dict): An object with 'position', 'width', and 'height'.
-
-        Returns:
-            bool: Returns True if there is NO collision (i.e., no overlap) and the rectangle is within map boundaries,
-                False if there is a collision or the rectangle goes outside the map boundaries.
-        """
-        # Define map boundaries
-        min_x = 0.5
-        max_x = 24
-        min_y = 2.5
-        max_y = 19.5
-
-        # Calculate the boundaries of the rectangle
-        rectangle = {
-            'northmost': y,
-            'southmost': y + height,
-            'westmost': x,
-            'eastmost': x + width
-        }
-        
-        # Ensure the rectangle is within the map boundaries
-        if not (min_x <= rectangle['westmost'] and rectangle['eastmost'] <= max_x and
-                min_y <= rectangle['northmost'] and rectangle['southmost'] <= max_y):
-            return False  # The rectangle is out of the map boundaries
-
-        # Calculate the boundaries of the object
-        obj_box = {
-            'northmost': obj['position'][1],
-            'southmost': obj['position'][1] + obj['height'],
-            'westmost': obj['position'][0],
-            'eastmost': obj['position'][0] + obj['width']
-        }
-
-        # Check if there is no overlap using the specified cardinal bounds
-        no_overlap = not (
-            (obj_box['northmost'] <= rectangle['northmost'] <= obj_box['southmost'] or
-            obj_box['northmost'] <= rectangle['southmost'] <= obj_box['southmost']) and (
-                (obj_box['westmost'] <= rectangle['westmost'] <= obj_box['eastmost'] or
-                obj_box['westmost'] <= rectangle['eastmost'] <= obj_box['eastmost'])
-            )
-        )
-        
-        return no_overlap
-
-    # The function will return False if the rectangle is outside the map boundaries or intersects with the object.
     
 
-    def hits_wall(self, x, y):
-        wall_width = 0.4
-        return (y <= 2 or y + self.size[1] >= self.map_height - wall_width or \
-                x + self.size[0] >= self.map_width - wall_width) 
+    
+    # def collision(self, x, y, width, height, obj):
+    #     """
+    #     Check if a rectangle defined by (x, y, width, height) does NOT intersect with an object
+    #     and ensure the rectangle stays within the map boundaries.
 
-    def neighbors(self, point, map_width, map_height, objs):
-        """Generate walkable neighboring points avoiding collisions with objects."""
-        step = 0.150
-        directions = [(0, step), (step, 0), (0, -step), (-step, 0)]  # Adjacent squares: N, E, S, W
-        x, y = point
+    #     Parameters:
+    #         x (float): The x-coordinate of the rectangle's top-left corner.
+    #         y (float): The y-coordinate of the rectangle's top-left corner.
+    #         width (float): The width of the rectangle.
+    #         height (float): The height of the rectangle.
+    #         obj (dict): An object with 'position', 'width', and 'height'.
+
+    #     Returns:
+    #         bool: Returns True if there is NO collision (i.e., no overlap) and the rectangle is within map boundaries,
+    #             False if there is a collision or the rectangle goes outside the map boundaries.
+    #     """
+    #     # Define map boundaries
+    #     min_x = 0.5
+    #     max_x = 24
+    #     min_y = 2.5
+    #     max_y = 19.5
+
+    #     # Calculate the boundaries of the rectangle
+    #     rectangle = {
+    #         'northmost': y,
+    #         'southmost': y + height,
+    #         'westmost': x,
+    #         'eastmost': x + width
+    #     }
         
-        results = []
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            collision = any(self.objects_overlap(nx, ny, self.size[0], self.size[1], obj['position'][0], obj['position'][1], obj['width'], obj['height']) for obj in objs)
-            if 0 <= nx < map_width and 0 <= ny < map_height and not collision and not self.hits_wall(nx, ny):
-                results.append((nx, ny))
-        return results
+    #     # Ensure the rectangle is within the map boundaries
+    #     if not (min_x <= rectangle['westmost'] and rectangle['eastmost'] <= max_x and
+    #             min_y <= rectangle['northmost'] and rectangle['southmost'] <= max_y):
+    #         return False  # The rectangle is out of the map boundaries
+
+    #     # Calculate the boundaries of the object
+    #     obj_box = {
+    #         'northmost': obj['position'][1],
+    #         'southmost': obj['position'][1] + obj['height'],
+    #         'westmost': obj['position'][0],
+    #         'eastmost': obj['position'][0] + obj['width']
+    #     }
+
+    #     # Check if there is no overlap using the specified cardinal bounds
+    #     no_overlap = not (
+    #         (obj_box['northmost'] <= rectangle['northmost'] <= obj_box['southmost'] or
+    #         obj_box['northmost'] <= rectangle['southmost'] <= obj_box['southmost']) and (
+    #             (obj_box['westmost'] <= rectangle['westmost'] <= obj_box['eastmost'] or
+    #             obj_box['westmost'] <= rectangle['eastmost'] <= obj_box['eastmost'])
+    #         )
+    #     )
+        
+    #     return no_overlap
+
+    # # The function will return False if the rectangle is outside the map boundaries or intersects with the object.
+    
+
+    # def hits_wall(self, x, y):
+    #     wall_width = 0.4
+    #     return (y <= 2 or y + self.size[1] >= self.map_height - wall_width or \
+    #             x + self.size[0] >= self.map_width - wall_width) 
+
+    
     def is_close_enough(self, current, goal:tuple|dict, tolerance=0.15, is_item = True):
         """Check if the current position is within tolerance of the goal position."""
         if is_item:
@@ -201,137 +167,73 @@ class Astar_agent:
 
         else:
             return (abs(current[0] - goal[0]) < tolerance and abs(current[1] - goal[1]) < tolerance)
-    def distance(self, a, b):
-        return np.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
 
-    def astar(self, start, goal, objs, map_width, map_height, is_item = True):
-        """Perform the A* algorithm to find the shortest path from start to goal."""
+    
+    def which_region(self, location:list|tuple) -> BoxRegion:
+        """Find which region the location is in
+
+        Args:
+            location (list | tuple): (x, y)
+
+        Returns:
+            BoxRegion: the region location is in
+        """
+        for box_region in regions:
+            if box_region.contains(location):
+                return box_region
+        raise Exception("location not on map")
+
+    
+    def normalized_manhattan_dist(self, start:tuple|list, goal:tuple|list) -> float:
+        """Return the normalized manhattan dist from start to goal
+
+        Args:
+            start (tuple | list): (x, y)
+            goal (tuple | list): (x, y)
+
+        Returns:
+            float: between 0 and 1
+        """
+        longest_possible_manhattan_dist = MAP_WIDTH + MAP_HEIGHT
+        dist = manhattan_distance(pos1=start, pos2=goal)
+        return dist / longest_possible_manhattan_dist
+    
+    def heuristic(self, box_region:BoxRegion, goal:list|tuple) -> float:
+        return self.normalized_manhattan_dist(start=box_region.midpoint, goal=goal)
+
+    
+    def astar(self, player, start, goal, obs):
+        """Perform high level planning to find a path from start location to goal region."""
+        start_region = self.which_region(start) # figure out which BoxRegion start is in
         frontier = PriorityQueue()
-        frontier.put(start, 0)
+        frontier.put(start_region, 0)
         came_from = {}
         cost_so_far = {}
         came_from[start] = None
-        cost_so_far[start] = 0
-        distance = 1000
+        cost_so_far[start_region] = 0
+
    
         while not frontier.empty():
-
-            current = frontier.get()
-            if self.is_close_enough(current, goal, is_item=is_item):
-                break
-
-            for next in self.neighbors(current, map_width, map_height, objs):
-                new_cost = cost_so_far[current] + 0.15  # Assume cost between neighbors is 1
-                if next not in cost_so_far or new_cost < cost_so_far[next]:
-                    cost_so_far[next] = new_cost
-                    priority = new_cost + self.heuristic(next, goal)
-                    frontier.put(next, priority)
-                    came_from[next] = current
-
+            curr_region:BoxRegion = frontier.get()
+            if curr_region.contains(goal):
+                break # found goal region
+            for neighbor_region in curr_region.neighbors:
+                cost_to_neighbor = cost_so_far[curr_region] + 1 + calculate_crowdedness_factor(player, neighbor_region, obs)
+                if neighbor_region not in cost_so_far or cost_so_far[neighbor_region] > cost_to_neighbor:
+                    cost_so_far[neighbor_region] = cost_to_neighbor
+                    priority = cost_to_neighbor + self.heuristic(neighbor_region, goal)
+                    frontier.put(neighbor_region, priority)
+                    came_from[neighbor_region] = curr_region
+            
         # Reconstruct path
-        if self.is_close_enough(current, goal, is_item=is_item):
-            path = []
-            while current:
-                path.append(current)
-                current = came_from[current]
-            path.reverse()
-            return path
+        path = []
+        while current:
+            path.append(current)
+            current = came_from[current]
+        path.reverse()
+        return path
 
-        return []  # No path found
-    # PlayerAction.NORTH: (Direction.NORTH, (0, -1), 0),
-    # PlayerAction.SOUTH: (Direction.SOUTH, (0, 1), 1),
-    # PlayerAction.EAST: (Direction.EAST, (1, 0), 2),
-    # PlayerAction.WEST: (Direction.WEST, (-1, 0), 3)
-    def from_path_to_actions(self, path):
-        """Convert a path to a list of actions."""
-        # if the current direction is not the same as the direction of the first step in the path, add a TURN action
-        # directions = [(0, step), (step, 0), (0, -step), (-step, 0)]  # Adjacent squares: N, E, S, W
-        actions = []
-        cur_dir = self.current_direction
-
-        for i in range(len(path) - 1):
-            x1, y1 = path[i]
-            x2, y2 = path[i + 1]
-            if x2 > x1:
-                if cur_dir != '2':
-                    actions.append('EAST')
-                    cur_dir = '2'
-                    actions.append('EAST' )
-                else:
-                    actions.append('EAST')
-            elif x2 < x1:
-                if cur_dir != '3':
-                    actions.append('WEST')
-                    cur_dir = '3'
-                    actions.append('WEST')
-                else:
-                    actions.append('WEST')
-            elif y2 < y1:
-                if cur_dir != '0':
-                    actions.append('NORTH')
-                    cur_dir = '0'
-                    actions.append('NORTH')
-                else:
-                    actions.append('NORTH')
-            elif y2 > y1:
-                if cur_dir != '1':
-                    actions.append('SOUTH')
-                    cur_dir = '1'
-                    actions.append('SOUTH')
-                else:
-                    actions.append('SOUTH')
-        return actions
-
-    def face_item(self, goal_x, goal_y):
-        x, y = self.player['position']
-        cur_dir = self.current_direction
-        #print("info: ", cur_dir, y, goal_y)
-        if goal_y < y:
-            if cur_dir != '0':
-                self.step('NORTH')
-                dis = abs(goal_y - y)
-                while dis> 0.75:
-                    self.step('NORTH')
-                    if abs(dis - abs(goal_y - self.player['position'][1])) < 0.1:
-                        break
-                    else:
-                        dis = abs(goal_y - self.player['position'][1])
-                return 'NORTH'
-        elif goal_y > y:
-            if cur_dir != '1':
-                self.step('SOUTH')
-                dis = abs(goal_y - y)
-                while dis > 0.75:
-                    self.step('SOUTH')
-                    if abs(dis - abs(goal_y - self.player['position'][1])) < 0.1:
-                        break
-                    else:
-                        dis = abs(goal_y - self.player['position'][1])
-                return 'SOUTH'
-
-    def perform_actions(self, actions):
-        """Perform a list of actions."""
-        for action in actions:
-            self.step(action)
-        return self.obs
-    def change_direction(self, direction):
-        cur_dir = self.current_direction
-        if direction == 'NORTH':
-            if cur_dir != '0':
-                self.step('NORTH')
-                return 'NORTH'
-        elif direction == 'SOUTH':
-            if cur_dir != '1':
-                self.step('SOUTH')
-                return 'SOUTH'
-        elif direction == 'EAST':
-            if cur_dir != '2':
-                self.step('EAST')
-                return 'EAST'
-        elif direction == 'WEST':
-            if cur_dir != '3':
-                self.step('WEST')
-                return 'WEST'
+    
 def find_item_position(data, item_name):
     """
     Finds the position of an item based on its name within the shelves section of the data structure.
@@ -379,61 +281,5 @@ if __name__=="__main__":
 
     # shopping_list = ['fresh fish', 'prepared foods']
 
-
-    if len(shopping_list) > 0:
-        print("go for basket")
-        path = agent.astar((agent.player['position'][0], agent.player['position'][1]),(basketReturns[0], basketReturns[1] ), objs, 20, 25)
-        actions = agent.from_path_to_actions(path)
-        agent.perform_actions(actions)
-        agent.face_item(basketReturns[0], basketReturns[1])
-        agent.step('INTERACT')
-        agent.step('INTERACT')
-        for item in shopping_list:
-            y_offset = 0
-            print("go for item: ", item)
-            item_pos = find_item_position(game_state, item)
-            if item != 'prepared foods' and item != 'fresh fish': 
-                item_pos = find_item_position(game_state, item)
-                #item = update_position_to_center(item_pos)
-            else:
-                if item == 'prepared foods':
-                    item_pos = [18.25, 4.75]
-                else:
-                    item_pos = [18.25, 10.75]
-            if item == 'milk' or item == 'chocolate milk' or item == 'strawberry milk':
-                y_offset = 3
-            # print("item_pos: ", item_pos)
-            path  = agent.astar((agent.player['position'][0], agent.player['position'][1]),
-                                (item_pos[0] + offset, item_pos[1] + y_offset), objs, 20, 25)
-            if path == None:
-                continue
-            agent.perform_actions(agent.from_path_to_actions(path))
-            agent.face_item(item_pos[0] + offset, item_pos[1])
-            #player.face_item(item_pos[0] + offset, item_pos[1])
-            for i in range(shopping_quant[shopping_list.index(item)]):
-                agent.step('INTERACT')
-                if item == 'prepared foods' and item == 'fresh fish':
-                    agent.step('INTERACT')
-
-        # go to closer register
-        if agent.player['position'][1] < 7:
-            path = agent.astar((agent.player['position'][0], agent.player['position'][1]),
-                                (registerReturns_1[0] + offset, registerReturns_1[1]), objs, 20, 25)
-            if path == None:
-                print("no path to register")
-            agent.perform_actions(agent.from_path_to_actions(path))
-            #player.face_item(registerReturns_1[0] + offset, registerReturns_1[1])
-        else:
-            path = agent.astar((agent.player['position'][0], agent.player['position'][1]),
-                                (registerReturns_2[0] + offset, registerReturns_2[1]), objs, 20, 25)
-            if path == None:
-                print("no path to register")
-            agent.perform_actions(agent.from_path_to_actions(path))
-            #player.face_item(registerReturns_2[0] + offset, registerReturns_2[1])
-    
-        agent.step('INTERACT')
-        agent.step('INTERACT')
-        agent.step('INTERACT')
-        print(agent.obs)
         
 

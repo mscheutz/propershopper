@@ -39,6 +39,38 @@ def euclidean_distance(pos1, pos2):
     # Calculate Euclidean distance between two points
     return ((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)**0.5
 
+def calculate_crowdedness_factor(player:dict, box:dict, observation:dict) -> float:
+    """Given an observation, a player, and a box region, calculate how crowded that region is
+
+    Args:
+        player (dict): the agent excluded in the calculation
+        box (dict): the region of interest {"westmost":float, "southmost":float, "eastmost":float, "northmost":float}
+        observation (dict): observation containing the players in the map
+    Returns:
+        how much empty space per unit area
+    """
+    area = abs(box['westmost'] - box['eastmost']) * abs(box['northmost'] - box['southmost'])
+    occupied_area = 0
+    for p in observation['players']:
+        if p['index'] == player['index']: # don't count our player
+            continue
+        if obj_overlap_with_box(p, box):
+            occupied_area += p['width']*p['height']
+    for c in observation['carts']:
+        if c['owner'] == player['index']: # don't count our cart
+            continue
+        if obj_overlap_with_box(c, box):
+            occupied_area += c['width'] * c['height']
+    for b in observation['baskets']:
+        if b['owner'] == player['index']: # don't count our basket
+            continue
+        if obj_overlap_with_box(b, box):
+            occupied_area += b['width'] * b['height']
+    return 1.0 - (occupied_area / area)
+    
+    # divide number of players by area of the box region
+    return player_count / (abs(box['westmost'] - box['eastmost']) * abs(box['northmost'] - box['southmost']))
+
 def bounding_box(place:dict) -> dict:
     """find the bounding box for a place.
 
@@ -124,12 +156,13 @@ def four_side_interact_area(place_obj:dict) -> dict:
     interact_boxes['EAST_BOX'] = east_interact_box
     return interact_boxes
 
-def player_overlap_with_interact_box(player, interact_box):
+def obj_overlap_with_box(obj:dict, box:dict):
+   obj['bounding_box'] = bounding_box(place=obj)
    return not (
-            player['bounding_box']['westmost'] > interact_box['eastmost'] or\
-            player['bounding_box']['northmost'] > interact_box['southmost'] or\
-            player['bounding_box']['eastmost'] < interact_box['westmost'] or\
-            player['bounding_box']['southmost'] < interact_box['northmost']
+            obj['bounding_box']['westmost'] > box['eastmost'] or\
+            obj['bounding_box']['northmost'] > box['southmost'] or\
+            obj['bounding_box']['eastmost'] < box['westmost'] or\
+            obj['bounding_box']['southmost'] < box['northmost']
         )
 
 
@@ -144,7 +177,7 @@ def can_interact_in_box(player, interact_box) -> bool:
         bool: Whether the player can interact in box
     """
     player['bounding_box'] = bounding_box(place=player)
-    if player_overlap_with_interact_box(player=player, interact_box=interact_box) and player['direction'] == interact_box['player_needs_to_face'].value:
+    if obj_overlap_with_box(obj=player, box=interact_box) and player['direction'] == interact_box['player_needs_to_face'].value:
         return True
     return False
 
@@ -159,7 +192,7 @@ def can_interact_player(player, place_obj) -> bool:
         bool: whether the player and the place can interact
     """
     for interact_box in place_obj['interact_boxes']:
-        if player_overlap_with_interact_box(player=player, interact_box=interact_box) and player_directions[player['direction']] == interact_box['player_needs_to_face']:
+        if obj_overlap_with_box(obj=player, box=interact_box) and player_directions[player['direction']] == interact_box['player_needs_to_face']:
             return True
     return False
 
