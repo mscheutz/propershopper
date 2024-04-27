@@ -1,0 +1,1229 @@
+{
+    "carts": [],
+    "baskets": [],
+    "registers": [
+        {
+            "height": 2.5,
+            "width": 2.25,
+            "position": [
+                1,
+                4.5
+            ],
+            "num_items": 0,
+            "foods": [],
+            "food_quantities": [],
+            "food_images": [],
+            "capacity": 12,
+            "image": "images/Registers/registersA.png",
+            "curr_player": null,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 4.25,
+                    "westmost": 1,
+                    "southmost": 4.5,
+                    "eastmost": 3.25,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 7.0,
+                    "westmost": 1,
+                    "southmost": 7.25,
+                    "eastmost": 3.25,
+                    "player_needs_to_face": "NORTH"
+                },
+                "WEST_BOX": {
+                    "northmost": 4.5,
+                    "westmost": 0.75,
+                    "southmost": 7.0,
+                    "eastmost": 1,
+                    "player_needs_to_face": "EAST"
+                },
+                "EAST_BOX": {
+                    "northmost": 4.5,
+                    "westmost": 3.25,
+                    "southmost": 7.0,
+                    "eastmost": 3.5,
+                    "player_needs_to_face": "WEST"
+                }
+            }
+        },
+        {
+            "height": 2.5,
+            "width": 2.25,
+            "position": [
+                1,
+                9.5
+            ],
+            "num_items": 0,
+            "foods": [],
+            "food_quantities": [],
+            "food_images": [],
+            "capacity": 12,
+            "image": "images/Registers/registersB.png",
+            "curr_player": null,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 9.25,
+                    "westmost": 1,
+                    "southmost": 9.5,
+                    "eastmost": 3.25,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 12.0,
+                    "westmost": 1,
+                    "southmost": 12.25,
+                    "eastmost": 3.25,
+                    "player_needs_to_face": "NORTH"
+                },
+                "WEST_BOX": {
+                    "northmost": 9.5,
+                    "westmost": 0.75,
+                    "southmost": 12.0,
+                    "eastmost": 1,
+                    "player_needs_to_face": "EAST"
+                },
+                "EAST_BOX": {
+                    "northmost": 9.5,
+                    "westmost": 3.25,
+                    "southmost": 12.0,
+                    "eastmost": 3.5,
+                    "player_needs_to_face": "WEST"
+                }
+            }
+        }
+    ],
+    "shelves": [
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                5.5,
+                1.5
+            ],
+            "food": "milk",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/milk.png",
+            "shelf_image": "images/Shelves/fridge.png",
+            "food_name": "milk",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 1.25,
+                    "westmost": 5.5,
+                    "southmost": 1.5,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 2.5,
+                    "westmost": 5.5,
+                    "southmost": 2.75,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                7.5,
+                1.5
+            ],
+            "food": "milk",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/milk.png",
+            "shelf_image": "images/Shelves/fridge.png",
+            "food_name": "milk",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 1.25,
+                    "westmost": 7.5,
+                    "southmost": 1.5,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 2.5,
+                    "westmost": 7.5,
+                    "southmost": 2.75,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                9.5,
+                1.5
+            ],
+            "food": "chocolate milk",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/milk_chocolate.png",
+            "shelf_image": "images/Shelves/fridge.png",
+            "food_name": "chocolate milk",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 1.25,
+                    "westmost": 9.5,
+                    "southmost": 1.5,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 2.5,
+                    "westmost": 9.5,
+                    "southmost": 2.75,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                11.5,
+                1.5
+            ],
+            "food": "chocolate milk",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/milk_chocolate.png",
+            "shelf_image": "images/Shelves/fridge.png",
+            "food_name": "chocolate milk",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 1.25,
+                    "westmost": 11.5,
+                    "southmost": 1.5,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 2.5,
+                    "westmost": 11.5,
+                    "southmost": 2.75,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                13.5,
+                1.5
+            ],
+            "food": "strawberry milk",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/milk_strawberry.png",
+            "shelf_image": "images/Shelves/fridge.png",
+            "food_name": "strawberry milk",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 1.25,
+                    "westmost": 13.5,
+                    "southmost": 1.5,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 2.5,
+                    "westmost": 13.5,
+                    "southmost": 2.75,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                5.5,
+                5.5
+            ],
+            "food": "apples",
+            "price": 5,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/apples.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "apples",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 5.25,
+                    "westmost": 5.5,
+                    "southmost": 5.5,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 6.5,
+                    "westmost": 5.5,
+                    "southmost": 6.75,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                7.5,
+                5.5
+            ],
+            "food": "oranges",
+            "price": 5,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/oranges.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "oranges",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 5.25,
+                    "westmost": 7.5,
+                    "southmost": 5.5,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 6.5,
+                    "westmost": 7.5,
+                    "southmost": 6.75,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                9.5,
+                5.5
+            ],
+            "food": "banana",
+            "price": 1,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/banana.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "banana",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 5.25,
+                    "westmost": 9.5,
+                    "southmost": 5.5,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 6.5,
+                    "westmost": 9.5,
+                    "southmost": 6.75,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                11.5,
+                5.5
+            ],
+            "food": "strawberry",
+            "price": 1,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/strawberry.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "strawberry",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 5.25,
+                    "westmost": 11.5,
+                    "southmost": 5.5,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 6.5,
+                    "westmost": 11.5,
+                    "southmost": 6.75,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                13.5,
+                5.5
+            ],
+            "food": "raspberry",
+            "price": 1,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/raspberry.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "raspberry",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 5.25,
+                    "westmost": 13.5,
+                    "southmost": 5.5,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 6.5,
+                    "westmost": 13.5,
+                    "southmost": 6.75,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                5.5,
+                9.5
+            ],
+            "food": "sausage",
+            "price": 4,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/sausage.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "sausage",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 9.25,
+                    "westmost": 5.5,
+                    "southmost": 9.5,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 10.5,
+                    "westmost": 5.5,
+                    "southmost": 10.75,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                7.5,
+                9.5
+            ],
+            "food": "steak",
+            "price": 5,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/meat_01.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "steak",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 9.25,
+                    "westmost": 7.5,
+                    "southmost": 9.5,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 10.5,
+                    "westmost": 7.5,
+                    "southmost": 10.75,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                9.5,
+                9.5
+            ],
+            "food": "steak",
+            "price": 5,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/meat_02.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "steak",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 9.25,
+                    "westmost": 9.5,
+                    "southmost": 9.5,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 10.5,
+                    "westmost": 9.5,
+                    "southmost": 10.75,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                11.5,
+                9.5
+            ],
+            "food": "chicken",
+            "price": 6,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/meat_03.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "chicken",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 9.25,
+                    "westmost": 11.5,
+                    "southmost": 9.5,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 10.5,
+                    "westmost": 11.5,
+                    "southmost": 10.75,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                13.5,
+                9.5
+            ],
+            "food": "ham",
+            "price": 6,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/ham.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "ham",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 9.25,
+                    "westmost": 13.5,
+                    "southmost": 9.5,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 10.5,
+                    "westmost": 13.5,
+                    "southmost": 10.75,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                5.5,
+                13.5
+            ],
+            "food": "brie cheese",
+            "price": 5,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/cheese_01.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "brie cheese",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 13.25,
+                    "westmost": 5.5,
+                    "southmost": 13.5,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 14.5,
+                    "westmost": 5.5,
+                    "southmost": 14.75,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                7.5,
+                13.5
+            ],
+            "food": "swiss cheese",
+            "price": 5,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/cheese_02.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "swiss cheese",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 13.25,
+                    "westmost": 7.5,
+                    "southmost": 13.5,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 14.5,
+                    "westmost": 7.5,
+                    "southmost": 14.75,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                9.5,
+                13.5
+            ],
+            "food": "cheese wheel",
+            "price": 15,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/cheese_03.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "cheese wheel",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 13.25,
+                    "westmost": 9.5,
+                    "southmost": 13.5,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 14.5,
+                    "westmost": 9.5,
+                    "southmost": 14.75,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                11.5,
+                13.5
+            ],
+            "food": "cheese wheel",
+            "price": 15,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/cheese_03.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "cheese wheel",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 13.25,
+                    "westmost": 11.5,
+                    "southmost": 13.5,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 14.5,
+                    "westmost": 11.5,
+                    "southmost": 14.75,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                13.5,
+                13.5
+            ],
+            "food": "cheese wheel",
+            "price": 15,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/cheese_03.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "cheese wheel",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 13.25,
+                    "westmost": 13.5,
+                    "southmost": 13.5,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 14.5,
+                    "westmost": 13.5,
+                    "southmost": 14.75,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                5.5,
+                17.5
+            ],
+            "food": "garlic",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/garlic.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "garlic",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 17.25,
+                    "westmost": 5.5,
+                    "southmost": 17.5,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 18.5,
+                    "westmost": 5.5,
+                    "southmost": 18.75,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                7.5,
+                17.5
+            ],
+            "food": "leek",
+            "price": 1,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/leek_onion.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "leek",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 17.25,
+                    "westmost": 7.5,
+                    "southmost": 17.5,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 18.5,
+                    "westmost": 7.5,
+                    "southmost": 18.75,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                9.5,
+                17.5
+            ],
+            "food": "red bell pepper",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/bell_pepper_red.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "red bell pepper",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 17.25,
+                    "westmost": 9.5,
+                    "southmost": 17.5,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 18.5,
+                    "westmost": 9.5,
+                    "southmost": 18.75,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                11.5,
+                17.5
+            ],
+            "food": "carrot",
+            "price": 1,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/carrot.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "carrot",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 17.25,
+                    "westmost": 11.5,
+                    "southmost": 17.5,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 18.5,
+                    "westmost": 11.5,
+                    "southmost": 18.75,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                13.5,
+                17.5
+            ],
+            "food": "lettuce",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/lettuce.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "lettuce",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 17.25,
+                    "westmost": 13.5,
+                    "southmost": 17.5,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 18.5,
+                    "westmost": 13.5,
+                    "southmost": 18.75,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                5.5,
+                21.5
+            ],
+            "food": "avocado",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/avocado.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "avocado",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 21.25,
+                    "westmost": 5.5,
+                    "southmost": 21.5,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 22.5,
+                    "westmost": 5.5,
+                    "southmost": 22.75,
+                    "eastmost": 7.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                7.5,
+                21.5
+            ],
+            "food": "broccoli",
+            "price": 1,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/broccoli.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "broccoli",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 21.25,
+                    "westmost": 7.5,
+                    "southmost": 21.5,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 22.5,
+                    "westmost": 7.5,
+                    "southmost": 22.75,
+                    "eastmost": 9.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                9.5,
+                21.5
+            ],
+            "food": "cucumber",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/cucumber.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "cucumber",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 21.25,
+                    "westmost": 9.5,
+                    "southmost": 21.5,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 22.5,
+                    "westmost": 9.5,
+                    "southmost": 22.75,
+                    "eastmost": 11.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                11.5,
+                21.5
+            ],
+            "food": "yellow bell pepper",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/bell_pepper_yellow.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "yellow bell pepper",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 21.25,
+                    "westmost": 11.5,
+                    "southmost": 21.5,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 22.5,
+                    "westmost": 11.5,
+                    "southmost": 22.75,
+                    "eastmost": 13.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        },
+        {
+            "height": 1,
+            "width": 2,
+            "position": [
+                13.5,
+                21.5
+            ],
+            "food": "onion",
+            "price": 2,
+            "capacity": 12,
+            "quantity": 12,
+            "food_image": "images/food/onion.png",
+            "shelf_image": "images/Shelves/shelf.png",
+            "food_name": "onion",
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 21.25,
+                    "westmost": 13.5,
+                    "southmost": 21.5,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 22.5,
+                    "westmost": 13.5,
+                    "southmost": 22.75,
+                    "eastmost": 15.5,
+                    "player_needs_to_face": "NORTH"
+                }
+            }
+        }
+    ],
+    "cartReturns": [
+        {
+            "height": 6,
+            "width": 0.7,
+            "position": [
+                1,
+                18.5
+            ],
+            "quantity": 5,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 18.25,
+                    "westmost": 1,
+                    "southmost": 18.5,
+                    "eastmost": 1.7,
+                    "player_needs_to_face": "SOUTH"
+                }
+            }
+        },
+        {
+            "height": 6,
+            "width": 0.7,
+            "position": [
+                2,
+                18.5
+            ],
+            "quantity": 6,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 18.25,
+                    "westmost": 2,
+                    "southmost": 18.5,
+                    "eastmost": 2.7,
+                    "player_needs_to_face": "SOUTH"
+                }
+            }
+        }
+    ],
+    "basketReturns": [
+        {
+            "height": 0.2,
+            "width": 0.3,
+            "position": [
+                3.5,
+                18.5
+            ],
+            "quantity": 12,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 18.25,
+                    "westmost": 3.5,
+                    "southmost": 18.5,
+                    "eastmost": 3.8,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 18.7,
+                    "westmost": 3.5,
+                    "southmost": 18.95,
+                    "eastmost": 3.8,
+                    "player_needs_to_face": "NORTH"
+                },
+                "WEST_BOX": {
+                    "northmost": 18.5,
+                    "westmost": 3.25,
+                    "southmost": 18.7,
+                    "eastmost": 3.5,
+                    "player_needs_to_face": "EAST"
+                },
+                "EAST_BOX": {
+                    "northmost": 18.5,
+                    "westmost": 3.8,
+                    "southmost": 18.7,
+                    "eastmost": 4.05,
+                    "player_needs_to_face": "WEST"
+                }
+            }
+        }
+    ],
+    "counters": [
+        {
+            "height": 2.25,
+            "width": 1.5,
+            "position": [
+                18.25,
+                4.75
+            ],
+            "food": "prepared foods",
+            "price": 15,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 4.5,
+                    "westmost": 18.25,
+                    "southmost": 4.75,
+                    "eastmost": 19.75,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 7.0,
+                    "westmost": 18.25,
+                    "southmost": 7.25,
+                    "eastmost": 19.75,
+                    "player_needs_to_face": "NORTH"
+                },
+                "WEST_BOX": {
+                    "northmost": 4.75,
+                    "westmost": 18.0,
+                    "southmost": 7.0,
+                    "eastmost": 18.25,
+                    "player_needs_to_face": "EAST"
+                },
+                "EAST_BOX": {
+                    "northmost": 4.75,
+                    "westmost": 19.75,
+                    "southmost": 7.0,
+                    "eastmost": 20.0,
+                    "player_needs_to_face": "WEST"
+                }
+            }
+        },
+        {
+            "height": 2.25,
+            "width": 1.5,
+            "position": [
+                18.25,
+                10.75
+            ],
+            "food": "fresh fish",
+            "price": 12,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 10.5,
+                    "westmost": 18.25,
+                    "southmost": 10.75,
+                    "eastmost": 19.75,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 13.0,
+                    "westmost": 18.25,
+                    "southmost": 13.25,
+                    "eastmost": 19.75,
+                    "player_needs_to_face": "NORTH"
+                },
+                "WEST_BOX": {
+                    "northmost": 10.75,
+                    "westmost": 18.0,
+                    "southmost": 13.0,
+                    "eastmost": 18.25,
+                    "player_needs_to_face": "EAST"
+                },
+                "EAST_BOX": {
+                    "northmost": 10.75,
+                    "westmost": 19.75,
+                    "southmost": 13.0,
+                    "eastmost": 20.0,
+                    "player_needs_to_face": "WEST"
+                }
+            }
+        },
+        {
+            "height": 2.25,
+            "width": 1.5,
+            "position": [
+                18.25,
+                10.75
+            ],
+            "food": "fresh fish",
+            "price": 12,
+            "interact_boxes": {
+                "NORTH_BOX": {
+                    "northmost": 10.5,
+                    "westmost": 18.25,
+                    "southmost": 10.75,
+                    "eastmost": 19.75,
+                    "player_needs_to_face": "SOUTH"
+                },
+                "SOUTH_BOX": {
+                    "northmost": 13.0,
+                    "westmost": 18.25,
+                    "southmost": 13.25,
+                    "eastmost": 19.75,
+                    "player_needs_to_face": "NORTH"
+                },
+                "WEST_BOX": {
+                    "northmost": 10.75,
+                    "westmost": 18.0,
+                    "southmost": 13.0,
+                    "eastmost": 18.25,
+                    "player_needs_to_face": "EAST"
+                },
+                "EAST_BOX": {
+                    "northmost": 10.75,
+                    "westmost": 19.75,
+                    "southmost": 13.0,
+                    "eastmost": 20.0,
+                    "player_needs_to_face": "WEST"
+                }
+            }
+        }
+    ]
+}
