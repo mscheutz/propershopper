@@ -396,8 +396,65 @@ class Agent:
 
     # TODO: Agent picks up an item and adds it to the cart
     def add_to_container(self):
-        print(f"Agent {self.agent_id} adding an item to the {self.container_type}")
-
+        #self.env
+        #a function to be used if the item is north of the player
+        violation=self.env['violations']
+        #moving the cart south of the player
+        action = "0 " + "SOUTH"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        #leaving the cart
+        action = "0 " + "TOGGLE_CART"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        #moving the player till it hits the shelf
+        while not any("shelf" in v for v in violation): #I've added shelf because the player might hit something else (a player of a cart)
+            action = "0 " + "NORTH"
+            sock_game.send(str.encode(action))  # send action to env
+            output = recv_socket_data(sock_game)  # get observation from env
+            self.env = json.loads(output)
+            current_p_y=self.env['observation']['players'][0]['position'][1]
+            violation=self.env['violations']
+        #picking up the item
+        action = "0 " + "INTERACT"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        #clearing the message
+        action = "0 " + "INTERACT"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        violation=[]
+        len(violation)
+        #moving back to the cart
+        while not any("cart" in v for v in violation):
+            action = "0 " + "SOUTH"
+            sock_game.send(str.encode(action))  # send action to env
+            output = recv_socket_data(sock_game)  # get observation from env
+            self.env = json.loads(output)
+            current_p_y=self.env['observation']['players'][0]['position'][1]
+            violation=self.env['violations']
+        #placing the item to the cart
+        action = "0 " + "INTERACT"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        #clearing the message
+        action = "0 " + "INTERACT"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        #re-picking the cart
+        action = "0 " + "TOGGLE_CART"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        
+        return self.env
+        
         pass  # TODO
 
         self.goal = ""
