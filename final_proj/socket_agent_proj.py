@@ -410,7 +410,7 @@ class Agent:
         output = recv_socket_data(sock_game)  # get observation from env
         self.env = json.loads(output)
         #moving the player till it hits the shelf
-        while not any("shelf" in v for v in violation): #I've added shelf because the player might hit something else (a player of a cart)
+        while not any("shelf" or "counter" in v for v in violation): #I've added shelf because the player might hit something else (a player of a cart)
             action = "0 " + "NORTH"
             sock_game.send(str.encode(action))  # send action to env
             output = recv_socket_data(sock_game)  # get observation from env
@@ -424,6 +424,22 @@ class Agent:
         self.env = json.loads(output)
         #clearing the message
         action = "0 " + "INTERACT"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        action = "0 " + "WEST"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        action = "0 " + "WEST"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        action = "0 " + "WEST"
+        sock_game.send(str.encode(action))  # send action to env
+        output = recv_socket_data(sock_game)  # get observation from env
+        self.env = json.loads(output)
+        action = "0 " + "WEST"
         sock_game.send(str.encode(action))  # send action to env
         output = recv_socket_data(sock_game)  # get observation from env
         self.env = json.loads(output)
