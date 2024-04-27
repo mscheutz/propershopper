@@ -430,7 +430,7 @@ class Agent:
         violation=[]
         len(violation)
         #moving back to the cart
-        while not any("cart" in v for v in violation):
+        while not any("basket" in v for v in violation):
             action = "0 " + "SOUTH"
             sock_game.send(str.encode(action))  # send action to env
             output = recv_socket_data(sock_game)  # get observation from env
