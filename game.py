@@ -3,6 +3,7 @@ from random import uniform, choice
 import pygame
 import config
 import os
+from helper import closest_relative_point, is_visible
 import render_game as render
 from camera import Camera
 from cart import Cart
@@ -17,6 +18,8 @@ from player import Player
 from shelves import Shelf
 from shoppingcarts import Carts
 from baskets import Baskets
+from shapely.geometry import Polygon, Point, LineString, MultiLineString
+from shapely import LineString, Polygon
 
 # from cart_state import CartState
 
@@ -786,10 +789,34 @@ class Game:
         obs = {"players": [], "carts": [], "baskets": []}
         # obs.update(self.get_interactivity_data())
 
+        # create player visibility range shape with origin point
+        current_player = self.players[self.curr_player]
+        radius = 3.0
+        
+        if current_player.direction == Direction.EAST: 
+            a = LineString([current_player.position, (current_player.position[0] + radius, current_player.position[1] - radius)])
+            b = LineString([current_player.position, (current_player.position[0] + radius, current_player.position[1] + radius)])
+        elif current_player.direction == Direction.WEST:
+            a = LineString([current_player.position, (current_player.position[0] - radius, current_player.position[1] - radius)])
+            b = LineString([current_player.position, (current_player.position[0] - radius, current_player.position[1] + radius)])
+        elif current_player.direction == Direction.NORTH:
+            a = LineString([current_player.position, (current_player.position[0] - radius, current_player.position[1] - radius)])
+            b = LineString([current_player.position, (current_player.position[0] + radius, current_player.position[1] - radius)])
+        elif current_player.direction == Direction.SOUTH:
+            a = LineString([current_player.position, (current_player.position[0] - radius, current_player.position[1] + radius)])
+            b = LineString([current_player.position, (current_player.position[0] + radius, current_player.position[1] + radius)])
+            
+        multi_line = MultiLineString([a, b])
+        line_poly = multi_line.convex_hull
+        player_vision = Polygon(line_poly)
+        
         for i, player in enumerate(self.players):
+            # giving each player that asked for the observation only their own info
+            if i != self.curr_player:
+                continue
             player_data = {
                 "index": player.player_number,
-                "position": player.position,
+                "position": [0.0, 0.0],
                 "width": player.width,
                 "height": player.height,
                 "sprite_path": player.sprite_path,
@@ -806,8 +833,12 @@ class Game:
             obs["players"].append(player_data)
             # JUMP
             for basket in self.baskets:
+                vision_overlap = is_visible(player_vision, basket.position, basket.height, basket.width)
+                if vision_overlap.is_empty:
+                    continue
+                
                 basket_data = {
-                    "position": basket.position,
+                    "position": closest_relative_point(vision_overlap, player.position),
                     "direction": DIRECTION_TO_INT[basket.direction],
                     "capacity": basket.capacity,
                     "owner": self.get_player_index(basket.owner),
@@ -823,8 +854,11 @@ class Game:
                     obs["baskets"].append(basket_data)
 
         for i, cart in enumerate(self.carts):
+            vision_overlap = is_visible(player_vision, cart.position, cart.height, cart.width)
+            if vision_overlap.is_empty:
+                continue
             cart_data = {
-                "position": cart.position,
+                "position": closest_relative_point(vision_overlap, player.position),
                 "direction": DIRECTION_TO_INT[cart.direction],
                 "capacity": cart.capacity,
                 "owner": self.get_player_index(cart.owner),
@@ -840,12 +874,15 @@ class Game:
 
         if render_static_objects:
             for obj in self.objects:
+                vision_overlap = is_visible(player_vision, obj.position, obj.height, obj.width)
+                if vision_overlap.is_empty:
+                    continue
                 if isinstance(obj, Cart) or isinstance(obj, Basket):
                     continue  # We've already added all the carts and baskets.
                 object_data = {
                     "height": obj.height,
                     "width": obj.width,
-                    "position": obj.position,
+                    "position": closest_relative_point(vision_overlap, player.position),
                 }
                 if isinstance(obj, Shelf):
                     object_data["food"] = obj.string_type
