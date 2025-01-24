@@ -14,7 +14,7 @@ import pygame
 action_file = "actions.txt"
 agent_completion_file = "agent_completion.txt"
 
-ACTION_COMMANDS = ['NOP', 'NORTH', 'SOUTH', 'EAST', 'WEST', 'INTERACT', 'TOGGLE_CART', 'CANCEL', 'SELECT','RESET']
+ACTION_COMMANDS = ['NOP', 'NORTH', 'SOUTH', 'EAST', 'WEST', 'INTERACT', 'TOGGLE_CART', 'CANCEL', 'PICKUP','RESET']
 
 def serialize_data(data):
     if isinstance(data, set):
@@ -72,7 +72,7 @@ class SupermarketEventHandler:
                         player.interacting = True
 
                     elif event.key == pygame.K_c:
-                        self.env.step(self.single_player_action(PlayerAction.TOGGLE))
+                        self.env.step(self.single_player_action(PlayerAction.TOGGLE_CART))
 
                     # switch players (up to 9 players)
                     else:
