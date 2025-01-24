@@ -5,6 +5,7 @@ import selectors
 import socket
 import types
 
+from enums.player_action import PlayerAction
 from env import SupermarketEnv, SinglePlayerSupermarketEnv
 from norms.norm import NormWrapper
 from norms.norms import *
@@ -13,8 +14,6 @@ import pygame
 
 action_file = "actions.txt"
 agent_completion_file = "agent_completion.txt"
-
-ACTION_COMMANDS = ['NOP', 'NORTH', 'SOUTH', 'EAST', 'WEST', 'INTERACT', 'TOGGLE_CART', 'CANCEL', 'PICKUP','RESET']
 
 def serialize_data(data):
     if isinstance(data, set):
@@ -383,8 +382,8 @@ if __name__ == "__main__":
                             if is_single_player(command):
                                 player, command, arg = get_player_and_command(command)
                                 e.append((key, mask, command))
-                                if command in ACTION_COMMANDS:
-                                    action_id = ACTION_COMMANDS.index(command)
+                                if command in PlayerAction.get_names():
+                                    action_id = PlayerAction[command].value
                                     curr_action[player] = (action_id, arg)
                                     should_perform_action = True
                                     action_taken[player].append(action_id)
@@ -400,7 +399,7 @@ if __name__ == "__main__":
                                         # for i in range(env.unwrapped.num_players):
                                         #     f.write("actions taken by player " + str(i) + ": \n")
                                         #     for action in action_taken[i]:
-                                        #         f.write(ACTION_COMMANDS[action] + "\n")
+                                        #         f.write(PlayerAction[action].name + "\n")
                                         f.close()
                                 else:
                                     info = {'result': False, 'step_cost': 0.0, 'message': 'Invalid Command'}

@@ -11,3 +11,7 @@ class PlayerAction(IntEnum):
     CANCEL      = 7,
     PICKUP      = 8,
     RESET       = 9
+
+    @classmethod
+    def get_names(cls):
+        return [member.name for member in cls]
