@@ -1,6 +1,7 @@
 # custom stuff for this project
 norm_log.txt
 agent_completion.txt
+actions.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
