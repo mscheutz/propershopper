@@ -8,7 +8,7 @@ Action_Probabilities = {
     PlayerAction.EAST : {PlayerAction.NORTH: 0, PlayerAction.SOUTH: 0, PlayerAction.EAST: 1, PlayerAction.WEST: 0, PlayerAction.NOP: 0},
     PlayerAction.WEST : {PlayerAction.NORTH: 0, PlayerAction.SOUTH: 0, PlayerAction.EAST: 0, PlayerAction.WEST: 1, PlayerAction.NOP: 0},
     PlayerAction.INTERACT : {PlayerAction.INTERACT: 1, PlayerAction.NOP: 0},
-    PlayerAction.TOGGLE : {PlayerAction.TOGGLE: 1, PlayerAction.NOP: 0},
+    PlayerAction.TOGGLE_CART : {PlayerAction.TOGGLE_CART: 1, PlayerAction.NOP: 0},
     PlayerAction.CANCEL : {PlayerAction.CANCEL: 1, PlayerAction.NOP: 0},
     PlayerAction.PICKUP : {PlayerAction.PICKUP: 1, PlayerAction.NOP: 0},
     PlayerAction.RESET : {PlayerAction.RESET: 1},
