@@ -138,7 +138,7 @@ and you can run using the following (after you first made sure that the socket i
 ## Command Line Options
 
 When running through the socket or from keyboard input, there are a number of command line arguments to specify aspects of the supermarket.
-
+- `--stay_alive` stops the game from closing after the agent leaves the store
 - `--num_players=<number of players>` specifies the number of players in the environment
 - `--port=<port number>` specifies which port to bind to
 - `--headless` sets the environement to headless mode
