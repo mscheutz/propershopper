@@ -1,7 +1,7 @@
 import time
 import random
 import gymnasium as gym
-from enums.player_action import PlayerAction, PlayerActionTable
+from enums.player_action import PlayerAction
 from game import Game
 
 MOVEMENT_ACTIONS = [PlayerAction.NORTH, PlayerAction.SOUTH, PlayerAction.EAST, PlayerAction.WEST]
@@ -52,7 +52,7 @@ class SupermarketEnv(gym.Env):
                 for row in content.split("\n"):
                     action_row = list(map(lambda column: column.strip(": "), row.split("\t")))
                     probability_pairs = map(lambda result: tuple(result.split(" ")), action_row[1:])
-                    self.action_probability[PlayerActionTable[action_row[0]]] = dict(map(lambda pair: (PlayerActionTable[pair[0]], float(pair[1])), probability_pairs))
+                    self.action_probability[PlayerAction[action_row[0]]] = dict(map(lambda pair: (PlayerAction[pair[0]], float(pair[1])), probability_pairs))
         # else: 
         #     self.action_probability = Action_Probabilities
 
@@ -73,7 +73,7 @@ class SupermarketEnv(gym.Env):
                 self.unwrapped.game.nop(i)
             elif player_action == PlayerAction.INTERACT:
                 self.unwrapped.game.interact(i)
-            elif player_action == PlayerAction.TOGGLE:
+            elif player_action == PlayerAction.TOGGLE_CART:
                 self.unwrapped.game.toggle_cart(i)
                 self.unwrapped.game.toggle_basket(i)
             elif player_action == PlayerAction.CANCEL:
@@ -144,7 +144,7 @@ class SinglePlayerSupermarketEnv(gym.Wrapper):
             self.unwrapped.game.nop(i)
         elif player_action == PlayerAction.INTERACT:
             self.unwrapped.game.interact(i)
-        elif player_action == PlayerAction.TOGGLE:
+        elif player_action == PlayerAction.TOGGLE_CART:
             self.unwrapped.game.toggle_cart(i)
             self.unwrapped.game.toggle_basket(i)
         elif player_action == PlayerAction.CANCEL:
