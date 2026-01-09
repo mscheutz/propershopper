@@ -1,4 +1,6 @@
 from enums.direction import Direction
+from shapely.geometry import Polygon, Point
+from shapely.ops import nearest_points
 
 
 def obj_collision(obj,  x_position, y_position, x_margin=0.55, y_margin=0.55):
@@ -29,3 +31,16 @@ def can_interact_default(obj, player, range=0.5):
     elif player.direction == Direction.EAST:
         return obj.collision(player, player.position[0] + range, player.position[1])
     return False
+
+def is_visible(player_vision, obj_position, obj_height, obj_width):
+    basket_points = [(obj_position), 
+                    (obj_position[0], obj_position[1] + obj_height), 
+                    (obj_position[0] + obj_width, obj_position[1] + obj_height),
+                    (obj_position[0] + obj_width, obj_position[1])]
+    basket_rectangle = Polygon(basket_points) 
+    return basket_rectangle.intersection(player_vision)
+
+def closest_relative_point(intersection, player_position):
+    closest_point = list(nearest_points(intersection, Point(player_position)))[0]
+    closest_relative = (closest_point.x - player_position[0], closest_point.y - player_position[1])
+    return closest_relative
